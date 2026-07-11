@@ -1,7 +1,7 @@
 use hecs::Entity;
 use hecs::EntityBuilder;
 use hecs::World;
-use rand::{Rng, RngExt};
+use rand::{RngExt};
 use raylib::ffi::*;
 use raylib::prelude::*;
 

@@ -1,10 +1,6 @@
 mod game;
 use game::Game;
 
-struct Number {
-    value: i64,
-}
-
 fn main() {
     let mut game = Game::new();
 

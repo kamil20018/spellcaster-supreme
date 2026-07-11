@@ -1,5 +1,5 @@
 use hecs::DynamicBundle;
-use raylib::{ffi::CSSPalette, prelude::*};
+use raylib::{prelude::*};
 
 pub struct Hexagon {
     pub color: Option<Color>,
