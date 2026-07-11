@@ -107,7 +107,7 @@ impl Game {
     fn transform<A: hecs::Component + Bundle, B: hecs::Component + Bundle>(&mut self) {
         let mut position_bundles = Vec::new();
         let mut del_entities = Vec::new();
-        
+
         for (_, entity, tile_pos, world_pos) in self
             .world
             .query_mut::<(&A, Entity, &TilePosition, &WorldPosition)>()
