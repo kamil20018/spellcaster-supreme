@@ -80,8 +80,8 @@ impl Game {
             d.clear_background(Color::GRAY);
 
             draw::tiles(&mut d, &mut self.world);
-            draw::textures(&mut d, &self.asset_manager);
             draw::nature(&mut d, &mut self.world);
+            draw::textures(&mut d, &self.asset_manager);
 
             unsafe {
                 let pressed = GuiButton(
@@ -95,7 +95,6 @@ impl Game {
                 );
 
                 if pressed == 1 {
-                    println!("Button pressed!");
                     self.ui_state.transform_grass = true;
                 }
             }
@@ -104,13 +103,17 @@ impl Game {
         });
     }
 
-    fn transform<A: hecs::Component + Bundle, B: hecs::Component + Bundle>(&mut self) {
+    fn transform<F, T>(&mut self)
+    where
+        F: hecs::Component + Bundle,
+        T: hecs::Component + Bundle,
+    {
         let mut position_bundles = Vec::new();
         let mut del_entities = Vec::new();
 
         for (_, entity, tile_pos, world_pos) in self
             .world
-            .query_mut::<(&A, Entity, &TilePosition, &WorldPosition)>()
+            .query_mut::<(&F, Entity, &TilePosition, &WorldPosition)>()
             .into_iter()
             .take(5)
         {
@@ -131,7 +134,7 @@ impl Game {
             self.world.spawn(
                 EntityBuilder::new()
                     .add_bundle(position_bundle)
-                    .add_bundle(B::get_bundle())
+                    .add_bundle(T::get_bundle())
                     .build(),
             );
         }

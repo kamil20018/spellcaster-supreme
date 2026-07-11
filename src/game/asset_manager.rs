@@ -30,15 +30,48 @@ impl AssetManager {
                 .unwrap_or_else(|_| panic!("Failed to create texture from image at: {file_path}"));
             textures.insert(component_type, texture);
         };
+        const SPELL_COMPONENT_TEXTURES: &[(&str, SpellComponents)] = &[
+            (
+                "resources/spell_components/apply_transform.png",
+                SpellComponents::ApplyTransform,
+            ),
+            (
+                "resources/spell_components/rune_grass.png",
+                SpellComponents::RuneGrass,
+            ),
+            (
+                "resources/spell_components/rune_rock.png",
+                SpellComponents::RuneRock,
+            ),
+            (
+                "resources/spell_components/rune_self.png",
+                SpellComponents::RuneSelf,
+            ),
+            (
+                "resources/spell_components/spell_area_1.png",
+                SpellComponents::SpellArea1,
+            ),
+            (
+                "resources/spell_components/spell_area_2.png",
+                SpellComponents::SpellArea2,
+            ),
+            (
+                "resources/spell_components/spell_area_3.png",
+                SpellComponents::SpellArea3,
+            ),
+            (
+                "resources/spell_components/spell_end.png",
+                SpellComponents::SpellEnd,
+            ),
+            (
+                "resources/spell_components/spell_start_single.png",
+                SpellComponents::SpellStartSingle,
+            ),
+        ];
 
-        add_texture(
-            "resources/spell_components/circle.png",
-            SpellComponents::Circle,
-        );
-        add_texture(
-            "resources/spell_components/mana_input.png",
-            SpellComponents::ManaInput,
-        );
+        for &(path, component_type) in SPELL_COMPONENT_TEXTURES {
+            add_texture(path, component_type);
+        }
     }
 
     #[allow(unused)]

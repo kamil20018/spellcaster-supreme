@@ -13,10 +13,10 @@ pub fn tiles(d: &mut RaylibDrawHandle, world: &mut World) {
 }
 
 pub fn textures(d: &mut RaylibDrawHandle, asset_manager: &AssetManager) {
-    if let Some(circle) = asset_manager.get(&SpellComponents::Circle) {
+    if let Some(circle) = asset_manager.get(&SpellComponents::SpellStartSingle) {
         d.draw_texture(circle, 150, 150, Color::WHITE);
     }
-    if let Some(circle) = asset_manager.get(&SpellComponents::ManaInput) {
+    if let Some(circle) = asset_manager.get(&SpellComponents::RuneSelf) {
         d.draw_texture(circle, 250, 250, Color::WHITE);
     }
 }
