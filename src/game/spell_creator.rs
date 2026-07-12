@@ -1,7 +1,6 @@
 #![allow(unused)]
 
-use crate::game::asset_manager::*;
-use crate::game::constant::*;
+use crate::game::{asset_manager::*, constant::*};
 
 pub trait SpellComponent {}
 

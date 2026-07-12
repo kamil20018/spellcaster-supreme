@@ -1,7 +1,4 @@
-use hecs::Entity;
-use hecs::EntityBuilder;
-use hecs::World;
-
+use hecs::{Entity, EntityBuilder, World};
 use rand::RngExt;
 use sfml::{
     cpp::FBox,
@@ -43,7 +40,7 @@ struct UiState {
 
 impl Game {
     pub fn new() -> Self {
-        let window: sfml::cpp::FBox<RenderWindow> = RenderWindow::new(
+        let window: FBox<RenderWindow> = RenderWindow::new(
             VideoMode::new(SCREEN_W, SCREEN_H, 32),
             "SFML Example",
             window::Style::CLOSE,
@@ -111,10 +108,7 @@ impl Game {
             .into_iter()
             .take(5)
         {
-            position_bundles.push((
-                TilePosition::from(*tile_pos),
-                WorldPosition::from(*world_pos),
-            ));
+            position_bundles.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
 
             del_entities.push(entity);
         }
@@ -140,9 +134,7 @@ impl Game {
                 let tile_pos = &TilePosition::new(x, y);
                 if Self::tile_in_bounds(tile_pos) {
                     self.world.spawn((
-                        Hexagon {
-                            color: Color::MAGENTA,
-                        },
+                        Hexagon { color: Color::MAGENTA },
                         TilePosition::new(x, y),
                         WorldPosition::from(Self::tile_to_global(tile_pos)),
                         HexTile {},
@@ -155,22 +147,13 @@ impl Game {
     fn spawn_nature(&mut self) {
         let mut grass_positions = Vec::new();
         let mut rock_positions = Vec::new();
-        for (_, tile_pos, world_pos) in self
-            .world
-            .query_mut::<(&HexTile, &TilePosition, &WorldPosition)>()
-        {
+        for (_, tile_pos, world_pos) in self.world.query_mut::<(&HexTile, &TilePosition, &WorldPosition)>() {
             match self.rng.random::<f32>() {
                 x if x < 0.1 => {
-                    grass_positions.push((
-                        TilePosition::from(*tile_pos),
-                        WorldPosition::from(*world_pos),
-                    ));
+                    grass_positions.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
                 }
                 x if x < 0.2 => {
-                    rock_positions.push((
-                        TilePosition::from(*tile_pos),
-                        WorldPosition::from(*world_pos),
-                    ));
+                    rock_positions.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
                 }
                 _ => {}
             };
@@ -178,17 +161,13 @@ impl Game {
 
         for position_bundle in rock_positions {
             let mut builder = EntityBuilder::new();
-            builder
-                .add_bundle(Rock::get_bundle())
-                .add_bundle(position_bundle);
+            builder.add_bundle(Rock::get_bundle()).add_bundle(position_bundle);
             self.world.spawn(builder.build());
         }
 
         for position_bundle in grass_positions {
             let mut builder = EntityBuilder::new();
-            builder
-                .add_bundle(Grass::get_bundle())
-                .add_bundle(position_bundle);
+            builder.add_bundle(Grass::get_bundle()).add_bundle(position_bundle);
             self.world.spawn(builder.build());
         }
     }

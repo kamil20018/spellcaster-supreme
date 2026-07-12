@@ -1,6 +1,5 @@
 use hecs::DynamicBundle;
-use sfml::graphics::Color;
-use sfml::system::Vector2f;
+use sfml::{graphics::Color, system::Vector2f};
 pub struct Hexagon {
     pub color: Color,
 }

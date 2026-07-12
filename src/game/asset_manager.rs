@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
+use sfml::{cpp::FBox, graphics::Texture};
+
 use crate::game::constant::*;
-use sfml::cpp::FBox;
-use sfml::graphics::Texture;
 
 pub struct AssetManager {
     spell_components: HashMap<SpellComponentTypes, FBox<Texture>>,
@@ -19,8 +19,7 @@ impl AssetManager {
 
     fn populate(textures: &mut HashMap<SpellComponentTypes, FBox<Texture>>) {
         let mut add_texture = |file_path: &str, component_type: SpellComponentTypes| {
-            let texture = Texture::from_file(file_path)
-                .unwrap_or_else(|_| panic!("Failed to load image: {file_path}"));
+            let texture = Texture::from_file(file_path).unwrap_or_else(|_| panic!("Failed to load image: {file_path}"));
 
             textures.insert(component_type, texture);
         };

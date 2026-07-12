@@ -1,12 +1,11 @@
-use crate::game::asset_manager::*;
-use crate::game::component::*;
-use crate::game::constant::*;
 use hecs::World;
 use sfml::{
     cpp::FBox,
     graphics::{CircleShape, RenderTarget, RenderWindow, Shape, Sprite, Transformable},
     system::Vector2f,
 };
+
+use crate::game::{asset_manager::*, component::*, constant::*};
 
 const CIRCLE_SCALE: f32 = 0.9;
 
@@ -15,10 +14,7 @@ pub fn tiles(window: &mut FBox<RenderWindow>, world: &mut World) {
         let mut circle = CircleShape::new(TILE_RADIUS * CIRCLE_SCALE, 6);
         circle.set_fill_color(hexagon.color);
         circle.set_position(world_position);
-        circle.set_origin(Vector2f::new(
-            TILE_RADIUS * CIRCLE_SCALE,
-            TILE_RADIUS * CIRCLE_SCALE,
-        ));
+        circle.set_origin(Vector2f::new(TILE_RADIUS * CIRCLE_SCALE, TILE_RADIUS * CIRCLE_SCALE));
         circle.set_rotation(30.);
         window.draw(&circle);
     }
