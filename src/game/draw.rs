@@ -2,32 +2,47 @@ use crate::game::asset_manager::*;
 use crate::game::component::*;
 use crate::game::constant::*;
 use hecs::World;
-use raylib::prelude::*;
+use sfml::{
+    cpp::FBox,
+    graphics::{CircleShape, RenderTarget, RenderWindow, Shape, Sprite, Transformable},
+    system::Vector2f,
+};
 
-pub fn tiles(d: &mut RaylibDrawHandle, world: &mut World) {
+const CIRCLE_SCALE: f32 = 0.9;
+
+pub fn tiles(window: &mut FBox<RenderWindow>, world: &mut World) {
     for (world_position, hexagon) in world.query_mut::<(&WorldPosition, &Hexagon)>() {
-        if let Some(color) = hexagon.color {
-            d.draw_poly(world_position, 6, TILE_RADIUS * 0.95, 0.0, color);
-        }
+        let mut circle = CircleShape::new(TILE_RADIUS * CIRCLE_SCALE, 6);
+        circle.set_fill_color(hexagon.color);
+        circle.set_position(world_position);
+        circle.set_origin(Vector2f::new(
+            TILE_RADIUS * CIRCLE_SCALE,
+            TILE_RADIUS * CIRCLE_SCALE,
+        ));
+        circle.set_rotation(30.);
+        window.draw(&circle);
     }
 }
 
-pub fn textures(d: &mut RaylibDrawHandle, asset_manager: &AssetManager) {
-    if let Some(circle) = asset_manager.get(&SpellComponents::SpellStartSingle) {
-        d.draw_texture(circle, 150, 150, Color::WHITE);
+pub fn textures(window: &mut FBox<RenderWindow>, asset_manager: &AssetManager) {
+    if let Some(circle) = asset_manager.get(&SpellComponentTypes::SpellStartSingle) {
+        let mut sprite = Sprite::with_texture(circle);
+        sprite.set_position(Vector2f::new(150.0, 150.0));
+        window.draw(&sprite);
     }
-    if let Some(circle) = asset_manager.get(&SpellComponents::RuneSelf) {
-        d.draw_texture(circle, 250, 250, Color::WHITE);
+    if let Some(circle) = asset_manager.get(&SpellComponentTypes::RuneSelf) {
+        let mut sprite = Sprite::with_texture(circle);
+        sprite.set_position(Vector2f::new(250.0, 250.0));
+        window.draw(&sprite);
     }
 }
 
-pub fn nature(d: &mut RaylibDrawHandle, world: &mut World) {
+pub fn nature(window: &mut FBox<RenderWindow>, world: &mut World) {
     for (world_position, circle) in world.query_mut::<(&WorldPosition, &Circle)>() {
-        d.draw_circle(
-            world_position.x as i32,
-            world_position.y as i32,
-            circle.radius,
-            circle.color,
-        );
+        let mut circle_shape = CircleShape::new(circle.radius, 16);
+        circle_shape.set_fill_color(circle.color);
+        circle_shape.set_position(world_position);
+        circle_shape.set_origin(Vector2f::new(circle.radius, circle.radius));
+        window.draw(&circle_shape);
     }
 }

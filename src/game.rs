@@ -1,12 +1,19 @@
 use hecs::Entity;
 use hecs::EntityBuilder;
 use hecs::World;
-use rand::{RngExt};
-use raylib::ffi::*;
-use raylib::prelude::*;
+
+use rand::RngExt;
+use sfml::{
+    cpp::FBox,
+    graphics::{Color, RenderTarget, RenderWindow},
+    system::Vector2f,
+    window::{self, ContextSettings, Event, Key, VideoMode},
+};
 
 mod asset_manager;
 use asset_manager::*;
+
+mod spell_creator;
 
 mod component;
 use component::*;
@@ -16,15 +23,14 @@ mod draw;
 mod constant;
 use constant::*;
 
-impl From<&WorldPosition> for Vector2 {
+impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
-        Vector2::new(wp.x, wp.y)
+        Vector2f::new(wp.x, wp.y)
     }
 }
 
 pub struct Game {
-    rl: RaylibHandle,
-    thread: RaylibThread,
+    window: FBox<RenderWindow>,
     asset_manager: AssetManager,
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
@@ -33,31 +39,32 @@ pub struct Game {
 
 struct UiState {
     spell_creator_active: bool,
-    transform_grass: bool,
 }
 
 impl Game {
     pub fn new() -> Self {
-        let (mut rl, thread) = raylib::init()
-            .size(SCREEN_W, SCREEN_H)
-            .title("Hello, World")
-            .build();
+        let window: sfml::cpp::FBox<RenderWindow> = RenderWindow::new(
+            VideoMode::new(SCREEN_W, SCREEN_H, 32),
+            "SFML Example",
+            window::Style::CLOSE,
+            &ContextSettings::default(),
+        )
+        .expect("Cannot create a new Render Window.");
+
         Game {
-            asset_manager: AssetManager::new(&mut rl, &thread),
-            rl: rl,
-            thread: thread,
+            window: window,
+            asset_manager: AssetManager::new(),
             world: World::new(),
             rng: rand::rng(),
             ui_state: UiState {
                 spell_creator_active: false,
-                transform_grass: false,
             },
         }
     }
 
     pub fn run(&mut self) {
         self.init();
-        while !self.rl.window_should_close() {
+        while self.window.is_open() {
             self.update();
             self.draw();
         }
@@ -69,40 +76,27 @@ impl Game {
     }
 
     fn update(&mut self) {
-        if self.ui_state.transform_grass {
-            self.transform::<Grass, Rock>();
-            self.ui_state.transform_grass = false;
+        while let Some(event) = self.window.poll_event() {
+            match event {
+                Event::Closed => self.window.close(),
+                Event::KeyPressed { code, .. } => match code {
+                    Key::Escape => self.window.close(),
+                    _ => {}
+                },
+                _ => {}
+            }
         }
     }
 
     fn draw(&mut self) {
-        self.rl.draw(&self.thread, |mut d| {
-            d.clear_background(Color::GRAY);
-
-            draw::tiles(&mut d, &mut self.world);
-            draw::nature(&mut d, &mut self.world);
-            draw::textures(&mut d, &self.asset_manager);
-
-            unsafe {
-                let pressed = GuiButton(
-                    ffi::Rectangle {
-                        x: 100.0,
-                        y: 100.0,
-                        width: 150.0,
-                        height: 40.0,
-                    },
-                    c"Click me".as_ptr(),
-                );
-
-                if pressed == 1 {
-                    self.ui_state.transform_grass = true;
-                }
-            }
-
-            d.draw_fps(0, 0);
-        });
+        self.window.clear(Color::rgb(2, 9, 46));
+        draw::tiles(&mut self.window, &mut self.world);
+        draw::nature(&mut self.window, &mut self.world);
+        draw::textures(&mut self.window, &mut self.asset_manager);
+        self.window.display();
     }
 
+    #[allow(unused)]
     fn transform<F, T>(&mut self)
     where
         F: hecs::Component + Bundle,
@@ -141,14 +135,13 @@ impl Game {
     }
 
     fn spawn_floor_tiles(&mut self) {
-        for x in 0..=30 {
-            for y in -15..=18 {
+        for x in 0..=45 {
+            for y in -20..=20 {
                 let tile_pos = &TilePosition::new(x, y);
                 if Self::tile_in_bounds(tile_pos) {
                     self.world.spawn((
                         Hexagon {
-                            color: Some(Color::PURPLE),
-                            texture: None,
+                            color: Color::MAGENTA,
                         },
                         TilePosition::new(x, y),
                         WorldPosition::from(Self::tile_to_global(tile_pos)),
@@ -200,9 +193,9 @@ impl Game {
         }
     }
 
-    fn tile_to_global(tile_pos: &TilePosition) -> Vector2 {
-        let x_vec = Vector2::new(1.5, SQRT_3 / 2.0) * tile_pos.x as f32;
-        let y_vec = Vector2::new(0.0, SQRT_3) * tile_pos.y as f32;
+    fn tile_to_global(tile_pos: &TilePosition) -> Vector2f {
+        let x_vec = Vector2f::new(1.5, SQRT_3 / 2.0) * tile_pos.x as f32;
+        let y_vec = Vector2f::new(0.0, SQRT_3) * tile_pos.y as f32;
         (x_vec + y_vec) * TILE_RADIUS
     }
 
@@ -216,24 +209,3 @@ impl Game {
         left >= 0.0 && right <= SCREEN_W as f32 && top >= 0.0 && bottom <= SCREEN_H as f32
     }
 }
-
-// const TILE_COUNT_W: i32 = 12;
-// const TILE_COUNT_H: i32 = 8;
-// fn draw_grid(d: &mut RaylibDrawHandle) {
-//     let x_start = SCREEN_W / 5 / 2;
-//     let tile_size = SCREEN_W * 4 / 5 / TILE_COUNT_W;
-
-//     let line_w = SCREEN_W * 4 / 5;
-//     let y_start = (SCREEN_H - tile_size * TILE_COUNT_H) / 2;
-//     let line_h = SCREEN_H - 2 * y_start;
-
-//     d.draw_rectangle(x_start, y_start, line_w, line_h, Color::MIDNIGHTBLUE);
-
-//     for x_i in 0..=TILE_COUNT_W {
-//         d.draw_rectangle(x_start + x_i * tile_size, y_start, 5, line_h, Color::BLACK);
-//     }
-
-//     for y_i in 0..=TILE_COUNT_H {
-//         d.draw_rectangle(x_start, y_start + y_i * tile_size, line_w, 5, Color::BLACK);
-//     }
-// }

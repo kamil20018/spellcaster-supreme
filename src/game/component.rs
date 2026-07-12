@@ -1,9 +1,8 @@
 use hecs::DynamicBundle;
-use raylib::{prelude::*};
-
+use sfml::graphics::Color;
+use sfml::system::Vector2f;
 pub struct Hexagon {
-    pub color: Option<Color>,
-    pub texture: Option<Texture2D>,
+    pub color: Color,
 }
 
 pub struct Circle {
@@ -23,7 +22,7 @@ impl Bundle for Rock {
         (
             Rock {},
             Circle {
-                color: Color::GRAY,
+                color: Color::rgb(100, 100, 100),
                 radius: 10.0,
             },
         )
@@ -66,8 +65,8 @@ impl WorldPosition {
     }
 }
 
-impl From<Vector2> for WorldPosition {
-    fn from(v: Vector2) -> Self {
+impl From<Vector2f> for WorldPosition {
+    fn from(v: Vector2f) -> Self {
         WorldPosition::new(v.x, v.y)
     }
 }
