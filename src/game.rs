@@ -31,10 +31,12 @@ pub struct Game {
     asset_manager: AssetManager,
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
+    #[allow(unused)]
     ui_state: UiState,
 }
 
 struct UiState {
+    #[allow(unused)]
     spell_creator_active: bool,
 }
 
@@ -78,6 +80,8 @@ impl Game {
                 Event::Closed => self.window.close(),
                 Event::KeyPressed { code, .. } => match code {
                     Key::Escape => self.window.close(),
+                    Key::R => self.transform::<Rock, Grass>(10),
+                    Key::G => self.transform::<Grass, Rock>(10),
                     _ => {}
                 },
                 _ => {}
@@ -93,8 +97,7 @@ impl Game {
         self.window.display();
     }
 
-    #[allow(unused)]
-    fn transform<F, T>(&mut self)
+    fn transform<F, T>(&mut self, count: usize)
     where
         F: hecs::Component + Bundle,
         T: hecs::Component + Bundle,
@@ -106,7 +109,7 @@ impl Game {
             .world
             .query_mut::<(&F, Entity, &TilePosition, &WorldPosition)>()
             .into_iter()
-            .take(5)
+            .take(count)
         {
             position_bundles.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
 
