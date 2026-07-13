@@ -1,7 +1,7 @@
 use sfml::{
     cpp::FBox,
     graphics::{Color, Drawable, RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
-    system::{Vector2f, Vector2u},
+    system::Vector2f,
 };
 
 pub struct Ui {
@@ -58,7 +58,7 @@ impl Window {
         self.render_texture = RenderTexture::new(texture_size.x as u32, texture_size.y as u32).unwrap();
         let pos = self.get_real_position();
         for child in &mut self.children {
-            child.init(&texture_size, &pos);
+            child.init(texture_size, pos);
         }
     }
 
@@ -109,9 +109,50 @@ impl Drawable for Window {
 }
 
 pub trait CustomUi {
-    fn init(&mut self, parent_size: &Vector2f, parent_position: &Vector2f);
+    fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f);
     fn update(&mut self);
-    fn get_real_position(&self, parent_size: &Vector2f, parent_position: &Vector2f) -> Vector2f;
+}
+
+pub struct WidgetData {
+    pub real_size: Vector2f,
+    pub real_position: Vector2f,
+    pub texture_position: Vector2f,
+    pub render_texture: FBox<RenderTexture>,
+}
+
+impl Default for WidgetData {
+    fn default() -> Self {
+        Self {
+            real_size: Vector2f::new(0.0, 0.0),
+            real_position: Vector2f::new(0.0, 0.0),
+            texture_position: Vector2f::new(0.0, 0.0),
+            render_texture: RenderTexture::new(1, 1).unwrap(),
+        }
+    }
+}
+
+impl WidgetData {
+    fn init(
+        &mut self,
+        parent_size: Vector2f,
+        parent_position: Vector2f,
+        relative_size: Vector2f,
+        relative_position: Vector2f,
+    ) {
+        self.real_size = Vector2f::new(parent_size.x * relative_size.x, parent_size.y * relative_size.y);
+        self.real_position = Vector2f::new(
+            parent_position.x + relative_position.x * parent_size.x,
+            parent_position.y + relative_position.y * parent_size.y,
+        );
+        self.texture_position = Vector2f::new(parent_size.x * relative_position.x, parent_size.y * relative_position.y);
+        self.render_texture = RenderTexture::new(self.real_size.x as u32, self.real_size.y as u32).unwrap();
+    }
+
+    pub fn draw(&self, target: &mut dyn RenderTarget, states: &RenderStates) {
+        let mut sprite = Sprite::with_texture(self.render_texture.texture());
+        sprite.set_position(self.texture_position);
+        target.draw_with_renderstates(&sprite, states);
+    }
 }
 
 pub struct Button {
@@ -120,10 +161,7 @@ pub struct Button {
     pub relative_position: Vector2f,
     pub bg_color: Color,
     //calculated / processed later
-    pub real_size: Vector2f,
-    pub real_position: Vector2f,
-    pub texture_position: Vector2f,
-    pub render_texture: FBox<RenderTexture>,
+    pub widget: WidgetData,
 }
 
 impl Default for Button {
@@ -133,10 +171,7 @@ impl Default for Button {
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
 
-            real_size: Vector2f::new(0.0, 0.0),
-            real_position: Vector2f::new(0.0, 0.0),
-            texture_position: Vector2f::new(0.0, 0.0),
-            render_texture: RenderTexture::new(1, 1).unwrap(),
+            widget: WidgetData::default(),
         }
     }
 }
@@ -144,28 +179,13 @@ impl Default for Button {
 impl UiElement for Button {}
 
 impl CustomUi for Button {
-    fn init(&mut self, parent_size: &Vector2f, parent_position: &Vector2f) {
-        self.real_size = Vector2f::new(
-            parent_size.x * self.relative_size.x,
-            parent_size.y * self.relative_size.y,
-        );
-        self.real_position = self.get_real_position(parent_size, parent_position);
-        self.render_texture = RenderTexture::new(self.real_size.x as u32, self.real_size.y as u32).unwrap();
-        self.texture_position = Vector2f::new(
-            parent_size.x * self.relative_position.x,
-            parent_size.y * self.relative_position.y,
-        );
+    fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
+        self.widget
+            .init(parent_size, parent_position, self.relative_size, self.relative_position);
     }
 
     fn update(&mut self) {
-        self.render_texture.clear(self.bg_color);
-    }
-
-    fn get_real_position(&self, parent_size: &Vector2f, parent_position: &Vector2f) -> Vector2f {
-        Vector2f {
-            x: parent_position.x + self.relative_position.x * parent_size.x,
-            y: parent_position.y + self.relative_position.y * parent_size.y,
-        }
+        self.widget.render_texture.clear(self.bg_color);
     }
 }
 
@@ -175,9 +195,6 @@ impl Drawable for Button {
         target: &mut dyn RenderTarget,
         states: &RenderStates<'texture, 'shader, 'shader_texture>,
     ) {
-        let mut sprite = Sprite::with_texture(self.render_texture.texture());
-
-        sprite.set_position(self.texture_position);
-        target.draw_with_renderstates(&sprite, states);
+        self.widget.draw(target, states);
     }
 }

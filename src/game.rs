@@ -2,7 +2,7 @@ use hecs::{Entity, EntityBuilder, World};
 use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
-    system::{Vector2, Vector2f, Vector2u},
+    system::Vector2f,
     window::{self, ContextSettings, Event, Key, VideoMode},
 };
 
