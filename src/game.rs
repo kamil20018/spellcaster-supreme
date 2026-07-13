@@ -2,14 +2,12 @@ use hecs::{Entity, EntityBuilder, World};
 use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
-    system::Vector2f,
+    system::{Vector2, Vector2f, Vector2u},
     window::{self, ContextSettings, Event, Key, VideoMode},
 };
 
 mod asset_manager;
 use asset_manager::*;
-
-mod spell_creator;
 
 mod component;
 use component::*;
@@ -22,6 +20,11 @@ use constant::*;
 mod spawner;
 use spawner::*;
 
+mod spell_creator;
+use spell_creator::*;
+
+mod ui;
+
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
         Vector2f::new(wp.x, wp.y)
@@ -33,12 +36,12 @@ pub struct Game {
     asset_manager: AssetManager,
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
-    #[allow(unused)]
     ui_state: UiState,
+    spell_creator: SpellCreator,
+    ui: ui::Ui,
 }
 
 struct UiState {
-    #[allow(unused)]
     spell_creator_active: bool,
 }
 
@@ -60,7 +63,34 @@ impl Game {
             ui_state: UiState {
                 spell_creator_active: false,
             },
+            spell_creator: SpellCreator::new(),
+            ui: ui::Ui {
+                windows: vec![
+                    ui::Window {
+                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        relative_position: Vector2f::new(0.05, 0.75),
+                        relative_size: Vector2f::new(0.9, 0.20),
+                        bg_color: Color::GREEN,
+                        ..Default::default()
+                    },
+                    ui::Window {
+                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        relative_position: Vector2f::new(0.75, 0.0),
+                        relative_size: Vector2f::new(0.2, 1.0),
+                        bg_color: Color::BLUE,
+                        ..Default::default()
+                    },
+                ],
+            },
         }
+    }
+
+    fn init(&mut self) {
+        self.ui.init();
+
+        let mut spawner = self.spawner();
+        spawner.spawn_floor_tiles();
+        spawner.spawn_nature();
     }
 
     pub fn run(&mut self) {
@@ -71,10 +101,6 @@ impl Game {
         }
     }
 
-    fn init(&mut self) {
-        self.spawner().spawn_floor_tiles().spawn_nature();
-    }
-
     fn update(&mut self) {
         while let Some(event) = self.window.poll_event() {
             match event {
@@ -83,18 +109,31 @@ impl Game {
                     Key::Escape => self.window.close(),
                     Key::R => self.transform::<Rock, Grass>(10),
                     Key::G => self.transform::<Grass, Rock>(10),
+                    Key::C => self.ui_state.spell_creator_active = !self.ui_state.spell_creator_active,
                     _ => {}
                 },
                 _ => {}
             }
         }
+
+        self.ui.update();
     }
 
     fn draw(&mut self) {
+        //stopgap measure for testing
+        if self.ui_state.spell_creator_active {
+            self.window.draw(&self.spell_creator);
+            self.window.display();
+            return;
+        }
+
         self.window.clear(Color::rgb(2, 9, 46));
         draw::tiles(&mut self.window, &mut self.world);
         draw::nature(&mut self.window, &mut self.world);
         draw::textures(&mut self.window, &mut self.asset_manager);
+
+        self.window.draw(&self.ui);
+
         self.window.display();
     }
 
