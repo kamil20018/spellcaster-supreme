@@ -65,22 +65,18 @@ impl Game {
             },
             spell_creator: SpellCreator::new(),
             ui: ui::Ui {
-                windows: vec![
-                    ui::Window {
-                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                        relative_position: Vector2f::new(0.05, 0.75),
-                        relative_size: Vector2f::new(0.9, 0.20),
-                        bg_color: Color::GREEN,
+                windows: vec![ui::Window {
+                    parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                    relative_position: Vector2f::new(0.2, 0.2),
+                    relative_size: Vector2f::new(0.6, 0.6),
+                    bg_color: Color::GREEN,
+                    children: vec![Box::new(ui::Button {
+                        relative_position: Vector2f::new(0.25, 0.25),
+                        relative_size: Vector2f::new(0.50, 0.50),
                         ..Default::default()
-                    },
-                    ui::Window {
-                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                        relative_position: Vector2f::new(0.75, 0.0),
-                        relative_size: Vector2f::new(0.2, 1.0),
-                        bg_color: Color::BLUE,
-                        ..Default::default()
-                    },
-                ],
+                    })],
+                    ..Default::default()
+                }],
             },
         }
     }
