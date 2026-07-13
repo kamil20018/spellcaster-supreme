@@ -1,5 +1,4 @@
 use hecs::{Entity, EntityBuilder, World};
-use rand::RngExt;
 use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
@@ -19,6 +18,9 @@ mod draw;
 
 mod constant;
 use constant::*;
+
+mod spawner;
+use spawner::*;
 
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
@@ -70,8 +72,7 @@ impl Game {
     }
 
     fn init(&mut self) {
-        self.spawn_floor_tiles();
-        self.spawn_nature();
+        self.spawner().spawn_floor_tiles().spawn_nature();
     }
 
     fn update(&mut self) {
@@ -131,63 +132,10 @@ impl Game {
         }
     }
 
-    fn spawn_floor_tiles(&mut self) {
-        for x in 0..=45 {
-            for y in -20..=20 {
-                let tile_pos = &TilePosition::new(x, y);
-                if Self::tile_in_bounds(tile_pos) {
-                    self.world.spawn((
-                        Hexagon { color: Color::MAGENTA },
-                        TilePosition::new(x, y),
-                        WorldPosition::from(Self::tile_to_global(tile_pos)),
-                        HexTile {},
-                    ));
-                }
-            }
+    fn spawner(&mut self) -> Spawner<'_> {
+        Spawner {
+            world: &mut self.world,
+            rng: &mut self.rng,
         }
-    }
-
-    fn spawn_nature(&mut self) {
-        let mut grass_positions = Vec::new();
-        let mut rock_positions = Vec::new();
-        for (_, tile_pos, world_pos) in self.world.query_mut::<(&HexTile, &TilePosition, &WorldPosition)>() {
-            match self.rng.random::<f32>() {
-                x if x < 0.1 => {
-                    grass_positions.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
-                }
-                x if x < 0.2 => {
-                    rock_positions.push((TilePosition::from(*tile_pos), WorldPosition::from(*world_pos)));
-                }
-                _ => {}
-            };
-        }
-
-        for position_bundle in rock_positions {
-            let mut builder = EntityBuilder::new();
-            builder.add_bundle(Rock::get_bundle()).add_bundle(position_bundle);
-            self.world.spawn(builder.build());
-        }
-
-        for position_bundle in grass_positions {
-            let mut builder = EntityBuilder::new();
-            builder.add_bundle(Grass::get_bundle()).add_bundle(position_bundle);
-            self.world.spawn(builder.build());
-        }
-    }
-
-    fn tile_to_global(tile_pos: &TilePosition) -> Vector2f {
-        let x_vec = Vector2f::new(1.5, SQRT_3 / 2.0) * tile_pos.x as f32;
-        let y_vec = Vector2f::new(0.0, SQRT_3) * tile_pos.y as f32;
-        (x_vec + y_vec) * TILE_RADIUS
-    }
-
-    fn tile_in_bounds(tile_pos: &TilePosition) -> bool {
-        let global_pos = Self::tile_to_global(tile_pos);
-        let left = global_pos.x - TILE_RADIUS;
-        let right = global_pos.x + TILE_RADIUS;
-        let top = global_pos.y - TILE_RADIUS;
-        let bottom = global_pos.y + TILE_RADIUS;
-
-        left >= 0.0 && right <= SCREEN_W as f32 && top >= 0.0 && bottom <= SCREEN_H as f32
     }
 }
