@@ -67,11 +67,11 @@ impl Game {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
                     relative_position: Vector2f::new(0.1, 0.1),
-                    relative_size: Vector2f::new(0.6, 0.6),
+                    relative_size: Vector2f::new(0.5, 0.5),
                     bg_color: Color::GREEN,
                     children: vec![Box::new(ui::Button {
                         relative_position: Vector2f::new(0.1, 0.1),
-                        relative_size: Vector2f::new(0.6, 0.6),
+                        relative_size: Vector2f::new(0.5, 0.5),
                         ..Default::default()
                     })],
                     ..Default::default()

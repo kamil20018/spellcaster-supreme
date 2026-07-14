@@ -39,6 +39,7 @@ impl CustomUi for Button {
 
     fn update(&mut self) {
         self.widget.render_texture.clear(self.bg_color);
+        self.widget.render_texture.display();
     }
 
     fn on_click(&self, click_pos: Vector2f) {

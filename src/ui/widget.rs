@@ -37,13 +37,11 @@ impl WidgetData {
             parent_position.x + relative_position.x * parent_size.x,
             parent_position.y + relative_position.y * parent_size.y,
         );
-        println!("{:?}", self.real_position);
-        //rendertexture draws bottom to top for some fucking reason (y axis not inverted)
         self.texture_position = Vector2f::new(
             parent_size.x * relative_position.x,
-            parent_size.y * (1.0 - relative_position.y - relative_size.y),
+            // parent_size.y * (1.0 - relative_position.y - relative_size.y),
+            parent_size.y * relative_position.y,
         );
-        println!("{:?}", self.texture_position);
         self.render_texture = RenderTexture::new(self.real_size.x as u32, self.real_size.y as u32).unwrap();
     }
 
