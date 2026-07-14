@@ -21,7 +21,10 @@ impl Default for Button {
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
 
-            widget: WidgetData::default(),
+            widget: WidgetData {
+                clickable: true,
+                ..Default::default()
+            },
         }
     }
 }
@@ -36,6 +39,12 @@ impl CustomUi for Button {
 
     fn update(&mut self) {
         self.widget.render_texture.clear(self.bg_color);
+    }
+
+    fn on_click(&self, click_pos: Vector2f) {
+        if self.widget.was_clicked(click_pos) {
+            println!("button clicked");
+        }
     }
 }
 

@@ -1,4 +1,7 @@
-use sfml::graphics::{Drawable, RenderStates, RenderTarget};
+use sfml::{
+    graphics::{Drawable, RenderStates, RenderTarget},
+    system::Vector2f,
+};
 
 pub mod traits;
 pub mod widget;
@@ -22,6 +25,12 @@ impl Ui {
     pub fn update(&mut self) {
         for window in &mut self.windows {
             window.update();
+        }
+    }
+
+    pub fn on_click(&self, click_pos: Vector2f) {
+        for window in &self.windows {
+            window.on_click(click_pos);
         }
     }
 }

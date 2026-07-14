@@ -108,7 +108,7 @@ impl Game {
                     _ => {}
                 },
                 Event::MouseButtonPressed { button, x, y } => match button {
-                    mouse::Button::Left => println!("{x} {y}"),
+                    mouse::Button::Left => self.ui.on_click(Vector2f::new(x as f32, y as f32)),
                     _ => {}
                 },
                 _ => {}

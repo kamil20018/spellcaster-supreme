@@ -19,7 +19,6 @@ pub struct Window {
 
 impl Window {
     pub fn init(&mut self) {
-        // let test = self.parent_size * self.relative_size;
         let texture_size = Vector2f::new(
             self.parent_size.x * self.relative_size.x,
             self.parent_size.y * self.relative_size.y,
@@ -39,6 +38,24 @@ impl Window {
 
         for child in &self.children {
             self.render_texture.draw(child.as_ref());
+        }
+    }
+
+    pub fn on_click(&self, click_pos: Vector2f) {
+        let real_position = self.get_real_position();
+        let real_size = Vector2f::new(
+            self.relative_size.x * self.parent_size.x,
+            self.relative_size.y * self.parent_size.y,
+        );
+        if real_position.x < click_pos.x
+            && click_pos.x < real_position.x + real_size.x
+            && real_position.y < click_pos.y
+            && click_pos.y < real_position.y + real_size.y
+        {
+            println!("window clicked");
+            for child in &self.children {
+                child.on_click(click_pos);
+            }
         }
     }
 

@@ -9,6 +9,7 @@ pub struct WidgetData {
     pub real_position: Vector2f,
     pub texture_position: Vector2f,
     pub render_texture: FBox<RenderTexture>,
+    pub clickable: bool,
 }
 
 impl Default for WidgetData {
@@ -18,6 +19,7 @@ impl Default for WidgetData {
             real_position: Vector2f::new(0.0, 0.0),
             texture_position: Vector2f::new(0.0, 0.0),
             render_texture: RenderTexture::new(1, 1).unwrap(),
+            clickable: false,
         }
     }
 }
@@ -35,11 +37,13 @@ impl WidgetData {
             parent_position.x + relative_position.x * parent_size.x,
             parent_position.y + relative_position.y * parent_size.y,
         );
+        println!("{:?}", self.real_position);
         //rendertexture draws bottom to top for some fucking reason (y axis not inverted)
         self.texture_position = Vector2f::new(
             parent_size.x * relative_position.x,
             parent_size.y * (1.0 - relative_position.y - relative_size.y),
         );
+        println!("{:?}", self.texture_position);
         self.render_texture = RenderTexture::new(self.real_size.x as u32, self.real_size.y as u32).unwrap();
     }
 
@@ -47,5 +51,12 @@ impl WidgetData {
         let mut sprite = Sprite::with_texture(self.render_texture.texture());
         sprite.set_position(self.texture_position);
         target.draw_with_renderstates(&sprite, states);
+    }
+
+    pub fn was_clicked(&self, click_pos: Vector2f) -> bool {
+        self.real_position.x < click_pos.x
+            && click_pos.x < self.real_position.x + self.real_size.x
+            && self.real_position.y < click_pos.y
+            && click_pos.y < self.real_position.y + self.real_size.y
     }
 }
