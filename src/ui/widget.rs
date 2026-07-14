@@ -1,0 +1,51 @@
+use sfml::{
+    cpp::FBox,
+    graphics::{RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
+    system::Vector2f,
+};
+
+pub struct WidgetData {
+    pub real_size: Vector2f,
+    pub real_position: Vector2f,
+    pub texture_position: Vector2f,
+    pub render_texture: FBox<RenderTexture>,
+}
+
+impl Default for WidgetData {
+    fn default() -> Self {
+        Self {
+            real_size: Vector2f::new(0.0, 0.0),
+            real_position: Vector2f::new(0.0, 0.0),
+            texture_position: Vector2f::new(0.0, 0.0),
+            render_texture: RenderTexture::new(1, 1).unwrap(),
+        }
+    }
+}
+
+impl WidgetData {
+    pub fn init(
+        &mut self,
+        parent_size: Vector2f,
+        parent_position: Vector2f,
+        relative_size: Vector2f,
+        relative_position: Vector2f,
+    ) {
+        self.real_size = Vector2f::new(parent_size.x * relative_size.x, parent_size.y * relative_size.y);
+        self.real_position = Vector2f::new(
+            parent_position.x + relative_position.x * parent_size.x,
+            parent_position.y + relative_position.y * parent_size.y,
+        );
+        //rendertexture draws bottom to top for some fucking reason (y axis not inverted)
+        self.texture_position = Vector2f::new(
+            parent_size.x * relative_position.x,
+            parent_size.y * (1.0 - relative_position.y - relative_size.y),
+        );
+        self.render_texture = RenderTexture::new(self.real_size.x as u32, self.real_size.y as u32).unwrap();
+    }
+
+    pub fn draw(&self, target: &mut dyn RenderTarget, states: &RenderStates) {
+        let mut sprite = Sprite::with_texture(self.render_texture.texture());
+        sprite.set_position(self.texture_position);
+        target.draw_with_renderstates(&sprite, states);
+    }
+}

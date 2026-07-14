@@ -3,7 +3,7 @@ use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
     system::Vector2f,
-    window::{self, ContextSettings, Event, Key, VideoMode},
+    window::{self, ContextSettings, Event, Key, VideoMode, mouse},
 };
 
 mod asset_manager;
@@ -23,8 +23,7 @@ use spawner::*;
 mod spell_creator;
 use spell_creator::*;
 
-mod ui;
-
+use crate::{ui, ui::Ui};
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
         Vector2f::new(wp.x, wp.y)
@@ -38,7 +37,7 @@ pub struct Game {
     rng: rand::rngs::ThreadRng,
     ui_state: UiState,
     spell_creator: SpellCreator,
-    ui: ui::Ui,
+    ui: Ui,
 }
 
 struct UiState {
@@ -64,15 +63,15 @@ impl Game {
                 spell_creator_active: false,
             },
             spell_creator: SpellCreator::new(),
-            ui: ui::Ui {
+            ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    relative_position: Vector2f::new(0.2, 0.2),
+                    relative_position: Vector2f::new(0.1, 0.1),
                     relative_size: Vector2f::new(0.6, 0.6),
                     bg_color: Color::GREEN,
                     children: vec![Box::new(ui::Button {
-                        relative_position: Vector2f::new(0.25, 0.25),
-                        relative_size: Vector2f::new(0.50, 0.50),
+                        relative_position: Vector2f::new(0.1, 0.1),
+                        relative_size: Vector2f::new(0.6, 0.6),
                         ..Default::default()
                     })],
                     ..Default::default()
@@ -106,6 +105,10 @@ impl Game {
                     Key::R => self.transform::<Rock, Grass>(10),
                     Key::G => self.transform::<Grass, Rock>(10),
                     Key::C => self.ui_state.spell_creator_active = !self.ui_state.spell_creator_active,
+                    _ => {}
+                },
+                Event::MouseButtonPressed { button, x, y } => match button {
+                    mouse::Button::Left => println!("{x} {y}"),
                     _ => {}
                 },
                 _ => {}

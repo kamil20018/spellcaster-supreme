@@ -1,4 +1,5 @@
 mod game;
+mod ui;
 use game::Game;
 
 fn main() {
