@@ -20,9 +20,6 @@ use constant::*;
 mod spawner;
 use spawner::*;
 
-mod spell_creator;
-use spell_creator::*;
-
 use crate::{ui, ui::Ui};
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
@@ -35,13 +32,7 @@ pub struct Game {
     asset_manager: AssetManager,
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
-    ui_state: UiState,
-    spell_creator: SpellCreator,
     ui: Ui,
-}
-
-struct UiState {
-    spell_creator_active: bool,
 }
 
 impl Game {
@@ -59,21 +50,29 @@ impl Game {
             asset_manager: AssetManager::new(),
             world: World::new(),
             rng: rand::rng(),
-            ui_state: UiState {
-                spell_creator_active: false,
-            },
-            spell_creator: SpellCreator::new(),
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
                     relative_position: Vector2f::new(0.1, 0.1),
                     relative_size: Vector2f::new(0.5, 0.5),
                     bg_color: Color::GREEN,
-                    children: vec![Box::new(ui::Button {
-                        relative_position: Vector2f::new(0.1, 0.1),
-                        relative_size: Vector2f::new(0.5, 0.5),
-                        ..Default::default()
-                    })],
+                    children: vec![
+                        Box::new(ui::Button {
+                            relative_position: Vector2f::new(0.1, 0.1),
+                            relative_size: Vector2f::new(0.1, 0.1),
+                            ..Default::default()
+                        }),
+                        Box::new(ui::Button {
+                            relative_position: Vector2f::new(0.2, 0.2),
+                            relative_size: Vector2f::new(0.1, 0.1),
+                            ..Default::default()
+                        }),
+                        Box::new(ui::Button {
+                            relative_position: Vector2f::new(0.3, 0.3),
+                            relative_size: Vector2f::new(0.1, 0.1),
+                            ..Default::default()
+                        }),
+                    ],
                     ..Default::default()
                 }],
             },
@@ -104,7 +103,6 @@ impl Game {
                     Key::Escape => self.window.close(),
                     Key::R => self.transform::<Rock, Grass>(10),
                     Key::G => self.transform::<Grass, Rock>(10),
-                    Key::C => self.ui_state.spell_creator_active = !self.ui_state.spell_creator_active,
                     _ => {}
                 },
                 Event::MouseButtonPressed { button, x, y } => match button {
@@ -119,13 +117,6 @@ impl Game {
     }
 
     fn draw(&mut self) {
-        //stopgap measure for testing
-        if self.ui_state.spell_creator_active {
-            self.window.draw(&self.spell_creator);
-            self.window.display();
-            return;
-        }
-
         self.window.clear(Color::rgb(2, 9, 46));
         draw::tiles(&mut self.window, &mut self.world);
         draw::nature(&mut self.window, &mut self.world);
