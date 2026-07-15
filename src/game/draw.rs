@@ -1,11 +1,11 @@
 use hecs::World;
 use sfml::{
     cpp::FBox,
-    graphics::{CircleShape, RenderTarget, RenderWindow, Shape, Sprite, Transformable},
+    graphics::{CircleShape, RenderTarget, RenderWindow, Shape, Transformable},
     system::Vector2f,
 };
 
-use crate::game::{asset_manager::*, component::*, constant::*};
+use crate::game::{component::*, constant::*};
 
 const CIRCLE_SCALE: f32 = 0.9;
 
@@ -20,18 +20,18 @@ pub fn tiles(window: &mut FBox<RenderWindow>, world: &mut World) {
     }
 }
 
-pub fn textures(window: &mut FBox<RenderWindow>, asset_manager: &AssetManager) {
-    if let Some(circle) = asset_manager.get(&SpellComponentTypes::SpellStartSingle) {
-        let mut sprite = Sprite::with_texture(circle);
-        sprite.set_position(Vector2f::new(150.0, 150.0));
-        window.draw(&sprite);
-    }
-    if let Some(circle) = asset_manager.get(&SpellComponentTypes::RuneSelf) {
-        let mut sprite = Sprite::with_texture(circle);
-        sprite.set_position(Vector2f::new(250.0, 250.0));
-        window.draw(&sprite);
-    }
-}
+// pub fn textures(window: &mut FBox<RenderWindow>, asset_manager: &AssetManager) {
+//     if let Some(circle) = asset_manager.get(&SpellComponentTypes::SpellStartSingle) {
+//         let mut sprite = Sprite::with_texture(circle);
+//         sprite.set_position(Vector2f::new(150.0, 150.0));
+//         window.draw(&sprite);
+//     }
+//     if let Some(circle) = asset_manager.get(&SpellComponentTypes::RuneSelf) {
+//         let mut sprite = Sprite::with_texture(circle);
+//         sprite.set_position(Vector2f::new(250.0, 250.0));
+//         window.draw(&sprite);
+//     }
+// }
 
 pub fn nature(window: &mut FBox<RenderWindow>, world: &mut World) {
     for (world_position, circle) in world.query_mut::<(&WorldPosition, &Circle)>() {

@@ -30,7 +30,6 @@ impl From<&WorldPosition> for Vector2f {
 
 pub struct Game {
     window: FBox<RenderWindow>,
-    asset_manager: AssetManager,
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
     ui: Ui,
@@ -60,38 +59,42 @@ impl Game {
             button_3: ui_id::new_id(),
         };
 
+        let buttons: Vec<Box<dyn ui::traits::UiElement>> = vec![
+            Box::new(ui::Button {
+                relative_position: Vector2f::new(0.1, 0.1),
+                relative_size: Vector2f::new(0.1, 0.1),
+                id: button_handles.button_1,
+                texture: Some(SpellComponentTypes::SpellStartSingle.get_texture()),
+                ..Default::default()
+            }),
+            Box::new(ui::Button {
+                relative_position: Vector2f::new(0.2, 0.2),
+                relative_size: Vector2f::new(0.1, 0.1),
+                id: button_handles.button_2,
+                texture: Some(SpellComponentTypes::SpellEnd.get_texture()),
+                ..Default::default()
+            }),
+            Box::new(ui::Button {
+                relative_position: Vector2f::new(0.3, 0.3),
+                relative_size: Vector2f::new(0.2, 0.1),
+                id: button_handles.button_3,
+                texture: Some(SpellComponentTypes::ApplyTransform.get_texture()),
+                ..Default::default()
+            }),
+        ];
+
         Game {
             window: window,
-            asset_manager: AssetManager::new(),
             world: World::new(),
             rng: rand::rng(),
             button_handles: button_handles,
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    relative_position: Vector2f::new(0.1, 0.1),
-                    relative_size: Vector2f::new(0.5, 0.5),
+                    relative_position: Vector2f::new(0.5, 0.0),
+                    relative_size: Vector2f::new(0.5, 1.0),
                     bg_color: Color::GREEN,
-                    children: vec![
-                        Box::new(ui::Button {
-                            relative_position: Vector2f::new(0.1, 0.1),
-                            relative_size: Vector2f::new(0.1, 0.1),
-                            id: button_handles.button_1,
-                            ..Default::default()
-                        }),
-                        Box::new(ui::Button {
-                            relative_position: Vector2f::new(0.2, 0.2),
-                            relative_size: Vector2f::new(0.1, 0.1),
-                            id: button_handles.button_2,
-                            ..Default::default()
-                        }),
-                        Box::new(ui::Button {
-                            relative_position: Vector2f::new(0.3, 0.3),
-                            relative_size: Vector2f::new(0.1, 0.1),
-                            id: button_handles.button_3,
-                            ..Default::default()
-                        }),
-                    ],
+                    children: buttons,
                     ..Default::default()
                 }],
                 ..Default::default()
@@ -149,10 +152,8 @@ impl Game {
         self.window.clear(Color::rgb(2, 9, 46));
         draw::tiles(&mut self.window, &mut self.world);
         draw::nature(&mut self.window, &mut self.world);
-        draw::textures(&mut self.window, &mut self.asset_manager);
 
         self.window.draw(&self.ui);
-
         self.window.display();
     }
 

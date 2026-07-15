@@ -1,5 +1,6 @@
 use sfml::{
-    graphics::{Color, Drawable, RenderStates, RenderTarget},
+    cpp::FBox,
+    graphics::{Color, Drawable, RenderStates, RenderTarget, Sprite, Texture, Transformable},
     system::Vector2f,
 };
 
@@ -11,6 +12,7 @@ pub struct Button {
     pub relative_position: Vector2f,
     pub bg_color: Color,
     pub id: u64,
+    pub texture: Option<FBox<Texture>>,
     //calculated / processed later
     pub widget: WidgetData,
 }
@@ -22,6 +24,7 @@ impl Default for Button {
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
             id: 0,
+            texture: None,
             widget: WidgetData {
                 clickable: true,
                 ..Default::default()
@@ -40,6 +43,15 @@ impl CustomUi for Button {
 
     fn update(&mut self) {
         self.widget.render_texture.clear(self.bg_color);
+        if let Some(texture) = &mut self.texture {
+            let tex_size = texture.size();
+            let mut sprite = Sprite::with_texture(texture);
+            sprite.scale((
+                self.widget.real_size.x / tex_size.x as f32,
+                self.widget.real_size.y / tex_size.y as f32,
+            ));
+            self.widget.render_texture.draw(&sprite);
+        }
         self.widget.render_texture.display();
     }
 
