@@ -3,16 +3,19 @@ use sfml::{
     system::Vector2f,
 };
 
+pub mod event;
 pub mod traits;
+pub mod ui_id;
 pub mod widget;
 pub mod widgets;
 pub mod window;
-
+pub use event::UiEvent;
 pub use widgets::Button;
 pub use window::Window;
 
 pub struct Ui {
     pub windows: Vec<Window>,
+    pub event_queue: Vec<UiEvent>,
 }
 
 impl Ui {
@@ -28,9 +31,24 @@ impl Ui {
         }
     }
 
-    pub fn on_click(&self, click_pos: Vector2f) {
+    pub fn on_click(&mut self, click_pos: Vector2f) {
         for window in &self.windows {
-            window.on_click(click_pos);
+            if let Some(events) = window.on_click(click_pos) {
+                self.event_queue.extend(events);
+            }
+        }
+    }
+
+    pub fn next_event(&mut self) -> Option<UiEvent> {
+        self.event_queue.pop()
+    }
+}
+
+impl Default for Ui {
+    fn default() -> Self {
+        Ui {
+            windows: Vec::new(),
+            event_queue: Vec::new(),
         }
     }
 }

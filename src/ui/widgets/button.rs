@@ -3,13 +3,14 @@ use sfml::{
     system::Vector2f,
 };
 
-use crate::ui::{traits::*, widget::*};
+use crate::ui::{event::UiEvent, traits::*, widget::*};
 
 pub struct Button {
     //actual user given stuff
     pub relative_size: Vector2f,
     pub relative_position: Vector2f,
     pub bg_color: Color,
+    pub id: u64,
     //calculated / processed later
     pub widget: WidgetData,
 }
@@ -20,7 +21,7 @@ impl Default for Button {
             relative_size: Vector2f::new(0.0, 0.0),
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
-
+            id: 0,
             widget: WidgetData {
                 clickable: true,
                 ..Default::default()
@@ -42,10 +43,11 @@ impl CustomUi for Button {
         self.widget.render_texture.display();
     }
 
-    fn on_click(&self, click_pos: Vector2f) {
+    fn on_click(&self, click_pos: Vector2f) -> Option<Vec<UiEvent>> {
         if self.widget.was_clicked(click_pos) {
-            println!("button clicked");
+            return Some(vec![UiEvent::ButtonClicked(self.id)]);
         }
+        None
     }
 }
 

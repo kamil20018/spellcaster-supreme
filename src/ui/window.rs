@@ -3,7 +3,7 @@ use sfml::{
     system::Vector2f,
 };
 
-use crate::ui::{traits::*, widget::*};
+use crate::ui::{event::UiEvent, traits::*, widget::*};
 
 pub struct Window {
     pub widget: WidgetData,
@@ -25,7 +25,6 @@ impl Window {
             self.relative_size,
             self.relative_position,
         );
-        println!("post widget init");
 
         for child in &mut self.children {
             child.init(self.widget.real_size, self.widget.real_position);
@@ -44,18 +43,19 @@ impl Window {
         self.widget.render_texture.display();
     }
 
-    pub fn on_click(&self, click_pos: Vector2f) {
+    pub fn on_click(&self, click_pos: Vector2f) -> Option<Vec<UiEvent>> {
         if self.widget.was_clicked(click_pos) {
-            if self.widget.clickable {
-                println!("window clicked");
-                //todo: add callback when implemented
-            } else {
-                println!("window not clickable");
-            }
+            let mut events: Vec<UiEvent> = Vec::new();
             for child in &self.children {
-                child.on_click(click_pos);
+                if let Some(child_events) = child.on_click(click_pos) {
+                    events.extend(child_events);
+                }
+            }
+            if events.len() > 0 {
+                return Some(events);
             }
         }
+        None
     }
 }
 

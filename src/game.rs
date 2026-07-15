@@ -20,7 +20,8 @@ use constant::*;
 mod spawner;
 use spawner::*;
 
-use crate::{ui, ui::Ui};
+use crate::ui::{self, Ui, event::UiEvent, ui_id};
+
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
         Vector2f::new(wp.x, wp.y)
@@ -33,6 +34,14 @@ pub struct Game {
     world: hecs::World,
     rng: rand::rngs::ThreadRng,
     ui: Ui,
+    button_handles: ButtonHandles,
+}
+
+#[derive(Clone, Copy)]
+struct ButtonHandles {
+    button_1: u64,
+    button_2: u64,
+    button_3: u64,
 }
 
 impl Game {
@@ -45,11 +54,18 @@ impl Game {
         )
         .expect("Cannot create a new Render Window.");
 
+        let button_handles = ButtonHandles {
+            button_1: ui_id::new_id(),
+            button_2: ui_id::new_id(),
+            button_3: ui_id::new_id(),
+        };
+
         Game {
             window: window,
             asset_manager: AssetManager::new(),
             world: World::new(),
             rng: rand::rng(),
+            button_handles: button_handles,
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
@@ -60,21 +76,25 @@ impl Game {
                         Box::new(ui::Button {
                             relative_position: Vector2f::new(0.1, 0.1),
                             relative_size: Vector2f::new(0.1, 0.1),
+                            id: button_handles.button_1,
                             ..Default::default()
                         }),
                         Box::new(ui::Button {
                             relative_position: Vector2f::new(0.2, 0.2),
                             relative_size: Vector2f::new(0.1, 0.1),
+                            id: button_handles.button_2,
                             ..Default::default()
                         }),
                         Box::new(ui::Button {
                             relative_position: Vector2f::new(0.3, 0.3),
                             relative_size: Vector2f::new(0.1, 0.1),
+                            id: button_handles.button_3,
                             ..Default::default()
                         }),
                     ],
                     ..Default::default()
                 }],
+                ..Default::default()
             },
         }
     }
@@ -90,12 +110,13 @@ impl Game {
     pub fn run(&mut self) {
         self.init();
         while self.window.is_open() {
+            self.process_input();
             self.update();
             self.draw();
         }
     }
 
-    fn update(&mut self) {
+    pub fn process_input(&mut self) {
         while let Some(event) = self.window.poll_event() {
             match event {
                 Event::Closed => self.window.close(),
@@ -112,8 +133,16 @@ impl Game {
                 _ => {}
             }
         }
+    }
 
+    fn update(&mut self) {
         self.ui.update();
+
+        while let Some(event) = &self.ui.next_event() {
+            match event {
+                UiEvent::ButtonClicked(button_id) => println!("button_id from event {}", button_id),
+            }
+        }
     }
 
     fn draw(&mut self) {
