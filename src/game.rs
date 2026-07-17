@@ -21,7 +21,7 @@ use constant::*;
 
 mod spawner;
 
-use crate::ui::{self, Ui, event::UiEvent, ui_id};
+use crate::ui::{self, Ui, event::UiEvent};
 
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
@@ -33,8 +33,6 @@ pub struct Game {
     window: FBox<RenderWindow>,
     play_field: PlayField,
     ui: Ui,
-    #[allow(unused)]
-    button_handles: ButtonHandles,
 }
 
 #[allow(unused)]
@@ -47,25 +45,19 @@ struct ButtonHandles {
 
 impl Game {
     pub fn new() -> Self {
-        let window: FBox<RenderWindow> = RenderWindow::new(
+        let mut window: FBox<RenderWindow> = RenderWindow::new(
             VideoMode::new(SCREEN_W, SCREEN_H, 32),
             "SFML Example",
             window::Style::CLOSE,
             &ContextSettings::default(),
         )
         .expect("Cannot create a new Render Window.");
+        window.set_framerate_limit(60);
 
-        let button_handles = ButtonHandles {
-            button_1: ui_id::new_id(),
-            button_2: ui_id::new_id(),
-            button_3: ui_id::new_id(),
-        };
-
-        let (buttons, _handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.01, 0.78));
-
+        let (buttons, _button_handles) =
+            ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.01, 0.05));
         Game {
             window: window,
-            button_handles: button_handles,
             play_field: PlayField {
                 render_texture: RenderTexture::new(SCREEN_W / 2, SCREEN_H).unwrap(),
                 world: World::new(),
@@ -74,8 +66,8 @@ impl Game {
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    relative_position: Vector2f::new(0.5, 0.0),
-                    relative_size: Vector2f::new(0.5, 1.0),
+                    relative_position: Vector2f::new(0.5, 0.8),
+                    relative_size: Vector2f::new(0.5, 0.2),
                     bg_color: Color::GREEN,
                     children: buttons,
                     ..Default::default()

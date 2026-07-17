@@ -67,6 +67,7 @@ impl PlayField {
         Spawner {
             world: &mut self.world,
             rng: &mut self.rng,
+            bounds: self.render_texture.size(),
         }
     }
 }

@@ -1,11 +1,12 @@
 use hecs::{EntityBuilder, World};
 use rand::RngExt;
-use sfml::graphics::Color;
+use sfml::{graphics::Color, system::Vector2u};
 
 use crate::game::{component::*, constant::*};
 pub struct Spawner<'a> {
     pub world: &'a mut World,
     pub rng: &'a mut rand::rngs::ThreadRng,
+    pub bounds: Vector2u,
 }
 
 impl Spawner<'_> {
@@ -13,7 +14,7 @@ impl Spawner<'_> {
         for x in 0..=45 {
             for y in -20..=20 {
                 let tile_pos = &TilePosition::new(x, y);
-                if Self::tile_in_bounds(tile_pos) {
+                if self.tile_in_bounds(tile_pos) {
                     self.world.spawn((
                         Hexagon { color: Color::MAGENTA },
                         TilePosition::new(x, y),
@@ -27,14 +28,14 @@ impl Spawner<'_> {
         self
     }
 
-    fn tile_in_bounds(tile_pos: &TilePosition) -> bool {
+    fn tile_in_bounds(&self, tile_pos: &TilePosition) -> bool {
         let global_pos = WorldPosition::from(*tile_pos);
         let left = global_pos.x - TILE_RADIUS;
         let right = global_pos.x + TILE_RADIUS;
         let top = global_pos.y - TILE_RADIUS;
         let bottom = global_pos.y + TILE_RADIUS;
 
-        left >= 0.0 && right <= SCREEN_W as f32 && top >= 0.0 && bottom <= SCREEN_H as f32
+        left >= 0.0 && right <= self.bounds.x as f32 && top >= 0.0 && bottom <= self.bounds.y as f32
     }
 
     pub fn spawn_nature(&mut self) -> &mut Self {

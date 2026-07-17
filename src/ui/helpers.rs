@@ -5,18 +5,27 @@ use crate::ui::{self, ui_id, widgets::*};
 pub fn spawn_button_grid(
     rows: usize,
     cols: usize,
-    rel_offset: Vector2f,
+    rel_padding: Vector2f,
 ) -> (Vec<Box<dyn ui::traits::UiElement>>, Vec<Vec<u64>>) {
     let mut buttons: Vec<Box<dyn ui::traits::UiElement>> = Vec::new();
     let mut ids: Vec<Vec<u64>> = Vec::new();
+
+    let relative_size = Vector2f::new(
+        (1.0 - rel_padding.x * (cols + 1) as f32) / cols as f32,
+        (1.0 - rel_padding.y * (rows + 1) as f32) / rows as f32,
+    );
 
     for row in 0..rows {
         ids.push(Vec::new());
         for col in 0..cols {
             let id = ui_id::new_id();
+            let relative_position = Vector2f::new(
+                col as f32 * (relative_size.x + rel_padding.x) + rel_padding.x,
+                row as f32 * (relative_size.y + rel_padding.y) + rel_padding.y,
+            );
             buttons.push(Box::new(Button {
-                relative_size: Vector2f::new(0.1, 0.1),
-                relative_position: Vector2f::new(0.11 * col as f32, 0.11 * row as f32) + rel_offset,
+                relative_size: relative_size,
+                relative_position: relative_position,
                 id: id.clone(),
                 ..Default::default()
             }));
