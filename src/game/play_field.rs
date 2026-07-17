@@ -1,23 +1,30 @@
-use hecs::{Entity, EntityBuilder};
+use hecs::{Entity, EntityBuilder, World};
 use sfml::{
     cpp::FBox,
-    graphics::{Drawable, RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
-    system::Vector2f,
+    graphics::{CircleShape, Drawable, RenderStates, RenderTarget, RenderTexture, Shape, Sprite, Transformable},
+    system::{Vector2f, Vector2u},
 };
 
 use crate::game::{
-    component::{self, TilePosition, WorldPosition},
-    draw,
+    component::{self, Circle, Hexagon, TilePosition, WorldPosition},
+    constant::*,
     spawner::Spawner,
 };
 
 pub struct PlayField {
-    pub render_texture: FBox<RenderTexture>,
-    pub world: hecs::World,
-    pub rng: rand::rngs::ThreadRng,
+    render_texture: FBox<RenderTexture>,
+    world: hecs::World,
+    rng: rand::rngs::ThreadRng,
 }
 
 impl PlayField {
+    pub fn new(texture_size: Vector2u) -> Self {
+        PlayField {
+            render_texture: RenderTexture::new(texture_size.x, texture_size.y).unwrap(),
+            world: World::new(),
+            rng: rand::rng(),
+        }
+    }
     pub fn init(&mut self) {
         let mut spawner = self.spawner();
         spawner.spawn_floor_tiles();
@@ -25,8 +32,23 @@ impl PlayField {
     }
 
     pub fn update(&mut self) {
-        draw::tiles(&mut self.render_texture, &mut self.world);
-        draw::nature(&mut self.render_texture, &mut self.world);
+        // draw::tiles(&mut self.render_texture, &mut self.world);
+        for (world_position, hexagon) in self.world.query_mut::<(&WorldPosition, &Hexagon)>() {
+            let mut circle = CircleShape::new(TILE_RADIUS * CIRCLE_SCALE, 6);
+            circle.set_fill_color(hexagon.color);
+            circle.set_position(world_position);
+            circle.set_origin(Vector2f::new(TILE_RADIUS * CIRCLE_SCALE, TILE_RADIUS * CIRCLE_SCALE));
+            circle.set_rotation(30.);
+            self.render_texture.draw(&circle);
+        }
+        // draw::nature(&mut self.render_texture, &mut self.world);
+        for (world_position, circle) in self.world.query_mut::<(&WorldPosition, &Circle)>() {
+            let mut circle_shape = CircleShape::new(circle.radius, 16);
+            circle_shape.set_fill_color(circle.color);
+            circle_shape.set_position(world_position);
+            circle_shape.set_origin(Vector2f::new(circle.radius, circle.radius));
+            self.render_texture.draw(&circle_shape);
+        }
     }
 
     pub fn transform<F, T>(&mut self, count: usize)

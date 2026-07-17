@@ -1,8 +1,7 @@
-use hecs::World;
 use sfml::{
     cpp::FBox,
-    graphics::{Color, RenderTarget, RenderTexture, RenderWindow},
-    system::Vector2f,
+    graphics::{Color, RenderTarget, RenderWindow},
+    system::{Vector2f, Vector2u},
     window::{self, ContextSettings, Event, Key, VideoMode, mouse},
 };
 
@@ -11,10 +10,11 @@ mod asset_manager;
 mod play_field;
 use play_field::*;
 
+mod spell_creator;
+use spell_creator::*;
+
 mod component;
 use component::*;
-
-mod draw;
 
 mod constant;
 use constant::*;
@@ -32,6 +32,7 @@ impl From<&WorldPosition> for Vector2f {
 pub struct Game {
     window: FBox<RenderWindow>,
     play_field: PlayField,
+    spell_creator: SpellCreator,
     ui: Ui,
 }
 
@@ -54,15 +55,15 @@ impl Game {
         .expect("Cannot create a new Render Window.");
         window.set_framerate_limit(60);
 
-        let (buttons, _button_handles) =
-            ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.01, 0.05));
+        let (buttons, _button_handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.01, 0.05));
+
         Game {
             window: window,
-            play_field: PlayField {
-                render_texture: RenderTexture::new(SCREEN_W / 2, SCREEN_H).unwrap(),
-                world: World::new(),
-                rng: rand::rng(),
-            },
+            play_field: PlayField::new(Vector2u::new(SCREEN_W / 2, SCREEN_H)),
+            spell_creator: SpellCreator::new(
+                Vector2u::new(SCREEN_W / 2, SCREEN_H * 4 / 5),
+                Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
+            ),
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
@@ -77,11 +78,6 @@ impl Game {
         }
     }
 
-    fn init(&mut self) {
-        self.ui.init();
-        self.play_field.init();
-    }
-
     pub fn run(&mut self) {
         self.init();
         while self.window.is_open() {
@@ -89,6 +85,11 @@ impl Game {
             self.update();
             self.draw();
         }
+    }
+
+    fn init(&mut self) {
+        self.ui.init();
+        self.play_field.init();
     }
 
     pub fn process_input(&mut self) {
@@ -113,6 +114,7 @@ impl Game {
     fn update(&mut self) {
         self.ui.update();
         self.play_field.update();
+        self.spell_creator.update();
 
         while let Some(event) = &self.ui.next_event() {
             match event {
@@ -124,7 +126,7 @@ impl Game {
     fn draw(&mut self) {
         self.window.clear(Color::rgb(2, 9, 46));
         self.window.draw(&self.play_field);
-
+        self.window.draw(&self.spell_creator);
         self.window.draw(&self.ui);
         self.window.display();
     }
