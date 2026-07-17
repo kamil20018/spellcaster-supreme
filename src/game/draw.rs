@@ -1,7 +1,7 @@
 use hecs::World;
 use sfml::{
     cpp::FBox,
-    graphics::{CircleShape, RenderTarget, RenderWindow, Shape, Transformable},
+    graphics::{CircleShape, RenderTarget, RenderTexture, Shape, Transformable},
     system::Vector2f,
 };
 
@@ -9,7 +9,7 @@ use crate::game::{component::*, constant::*};
 
 const CIRCLE_SCALE: f32 = 0.9;
 
-pub fn tiles(window: &mut FBox<RenderWindow>, world: &mut World) {
+pub fn tiles(window: &mut FBox<RenderTexture>, world: &mut World) {
     for (world_position, hexagon) in world.query_mut::<(&WorldPosition, &Hexagon)>() {
         let mut circle = CircleShape::new(TILE_RADIUS * CIRCLE_SCALE, 6);
         circle.set_fill_color(hexagon.color);
@@ -33,7 +33,7 @@ pub fn tiles(window: &mut FBox<RenderWindow>, world: &mut World) {
 //     }
 // }
 
-pub fn nature(window: &mut FBox<RenderWindow>, world: &mut World) {
+pub fn nature(window: &mut FBox<RenderTexture>, world: &mut World) {
     for (world_position, circle) in world.query_mut::<(&WorldPosition, &Circle)>() {
         let mut circle_shape = CircleShape::new(circle.radius, 16);
         circle_shape.set_fill_color(circle.color);

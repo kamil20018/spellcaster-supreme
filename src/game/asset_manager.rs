@@ -1,3 +1,4 @@
+#![allow(unused)]
 use sfml::{cpp::FBox, graphics::Texture};
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy)]

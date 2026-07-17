@@ -28,7 +28,6 @@ impl Spawner<'_> {
     }
 
     fn tile_in_bounds(tile_pos: &TilePosition) -> bool {
-        // let global_pos = Self::tile_to_global(tile_pos);
         let global_pos = WorldPosition::from(*tile_pos);
         let left = global_pos.x - TILE_RADIUS;
         let right = global_pos.x + TILE_RADIUS;

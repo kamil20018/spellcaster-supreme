@@ -19,7 +19,7 @@ impl Default for WidgetData {
             real_position: Vector2f::new(0.0, 0.0),
             texture_position: Vector2f::new(0.0, 0.0),
             render_texture: RenderTexture::new(1, 1).unwrap(),
-            clickable: false,
+            clickable: true,
         }
     }
 }

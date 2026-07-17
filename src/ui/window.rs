@@ -44,7 +44,7 @@ impl Window {
     }
 
     pub fn on_click(&self, click_pos: Vector2f) -> Option<Vec<UiEvent>> {
-        if self.widget.was_clicked(click_pos) {
+        if self.widget.was_clicked(click_pos) && self.widget.clickable {
             let mut events: Vec<UiEvent> = Vec::new();
             for child in &self.children {
                 if let Some(child_events) = child.on_click(click_pos) {

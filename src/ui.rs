@@ -4,13 +4,13 @@ use sfml::{
 };
 
 pub mod event;
+pub mod helpers;
 pub mod traits;
 pub mod ui_id;
 pub mod widget;
 pub mod widgets;
 pub mod window;
 pub use event::UiEvent;
-pub use widgets::Button;
 pub use window::Window;
 
 pub struct Ui {
