@@ -1,7 +1,7 @@
 use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
-    system::{Vector2f, Vector2u},
+    system::{Vector2f, Vector2i, Vector2u},
     window::{self, ContextSettings, Event, Key, VideoMode, mouse},
 };
 
@@ -55,6 +55,7 @@ impl Game {
         )
         .expect("Cannot create a new Render Window.");
         window.set_framerate_limit(60);
+        window.set_position(Vector2i::new(270, 190));
 
         let (buttons, _button_handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
 
