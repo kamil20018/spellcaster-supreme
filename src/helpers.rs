@@ -1,6 +1,10 @@
 use sfml::system::Vector2f;
+use strum::IntoEnumIterator;
 
-use crate::ui::{self, ui_id, widgets::*};
+use crate::{
+    game::asset_manager::SpellComponentTypes,
+    ui::{self, ui_id, widgets::*},
+};
 
 pub fn spawn_button_grid(
     rows: usize,
@@ -20,6 +24,8 @@ pub fn spawn_button_grid(
         relative_size.x = (1.0 - rel_padding.x * (cols - 1) as f32) / cols as f32;
     }
 
+    let mut spell_component_iter = SpellComponentTypes::iter();
+
     for row in 0..rows {
         ids.push(Vec::new());
         for col in 0..cols {
@@ -32,10 +38,18 @@ pub fn spawn_button_grid(
             if !padding_sides {
                 relative_position.x = col as f32 * (relative_size.x + rel_padding.x);
             }
+
+            let mut text = None;
+
+            if let Some(spell_component) = spell_component_iter.next() {
+                text = Some(String::from(spell_component.button_name()));
+            }
+
             buttons.push(Box::new(Button {
                 relative_size: relative_size,
                 relative_position: relative_position,
                 id: id.clone(),
+                text: text,
                 ..Default::default()
             }));
             ids[row].push(id);

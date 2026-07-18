@@ -1,6 +1,6 @@
 use sfml::{
     cpp::FBox,
-    graphics::{RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
+    graphics::{FloatRect, RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
     system::Vector2f,
 };
 
@@ -49,6 +49,13 @@ impl WidgetData {
         let mut sprite = Sprite::with_texture(self.render_texture.texture());
         sprite.set_position(self.texture_position);
         target.draw_with_renderstates(&sprite, states);
+    }
+
+    pub fn center_text(&self, rect: FloatRect) -> Vector2f {
+        Vector2f {
+            x: (self.real_size.x - rect.width) / 2.0 - rect.left,
+            y: (self.real_size.y - rect.height) / 2.0 - rect.top,
+        }
     }
 
     pub fn was_clicked(&self, click_pos: Vector2f) -> bool {

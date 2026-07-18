@@ -1,4 +1,5 @@
 mod game;
+mod helpers;
 mod ui;
 use game::Game;
 

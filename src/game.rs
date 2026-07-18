@@ -5,7 +5,7 @@ use sfml::{
     window::{self, ContextSettings, Event, Key, VideoMode, mouse},
 };
 
-mod asset_manager;
+pub mod asset_manager;
 
 mod play_field;
 use play_field::*;
@@ -22,7 +22,10 @@ use constant::*;
 mod spawner;
 mod style;
 
-use crate::ui::{self, Ui, event::UiEvent};
+use crate::{
+    helpers,
+    ui::{self, Ui, event::UiEvent},
+};
 
 impl From<&WorldPosition> for Vector2f {
     fn from(wp: &WorldPosition) -> Self {
@@ -57,7 +60,7 @@ impl Game {
         window.set_framerate_limit(60);
         window.set_position(Vector2i::new(270, 190));
 
-        let (buttons, _button_handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
+        let (buttons, _button_handles) = helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
 
         Game {
             window: window,

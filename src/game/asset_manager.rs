@@ -1,7 +1,8 @@
 #![allow(unused)]
 use sfml::{cpp::FBox, graphics::Texture};
+use strum_macros::EnumIter;
 
-#[derive(Hash, Eq, PartialEq, Clone, Copy)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy, EnumIter)]
 pub enum SpellComponentTypes {
     ApplyTransform,
     RuneGrass,
@@ -15,7 +16,7 @@ pub enum SpellComponentTypes {
 }
 
 impl SpellComponentTypes {
-    fn texture_path(self) -> &'static str {
+    pub fn texture_path(self) -> &'static str {
         match self {
             SpellComponentTypes::ApplyTransform => "resources/spell_components/apply_transform.png",
             SpellComponentTypes::RuneGrass => "resources/spell_components/rune_grass.png",
@@ -26,6 +27,20 @@ impl SpellComponentTypes {
             SpellComponentTypes::SpellArea3 => "resources/spell_components/spell_area_3.png",
             SpellComponentTypes::SpellEnd => "resources/spell_components/spell_end.png",
             SpellComponentTypes::SpellStartSingle => "resources/spell_components/spell_start_single.png",
+        }
+    }
+
+    pub fn button_name(self) -> &'static str {
+        match self {
+            SpellComponentTypes::ApplyTransform => "Apply\nTransform",
+            SpellComponentTypes::RuneGrass => "Rune\nGrass",
+            SpellComponentTypes::RuneRock => "Rune\nRock",
+            SpellComponentTypes::RuneSelf => "Rune\nSelf",
+            SpellComponentTypes::SpellArea1 => "Area\n1",
+            SpellComponentTypes::SpellArea2 => "Area\n2",
+            SpellComponentTypes::SpellArea3 => "Area\n3",
+            SpellComponentTypes::SpellEnd => "Spell\nEnd",
+            SpellComponentTypes::SpellStartSingle => "Spell\nStart",
         }
     }
 
