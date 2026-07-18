@@ -20,6 +20,7 @@ mod constant;
 use constant::*;
 
 mod spawner;
+mod style;
 
 use crate::ui::{self, Ui, event::UiEvent};
 
@@ -48,28 +49,28 @@ impl Game {
     pub fn new() -> Self {
         let mut window: FBox<RenderWindow> = RenderWindow::new(
             VideoMode::new(SCREEN_W, SCREEN_H, 32),
-            "SFML Example",
+            "Spellcaster Supreme",
             window::Style::CLOSE,
             &ContextSettings::default(),
         )
         .expect("Cannot create a new Render Window.");
         window.set_framerate_limit(60);
 
-        let (buttons, _button_handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.01, 0.05));
+        let (buttons, _button_handles) = ui::helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
 
         Game {
             window: window,
             play_field: PlayField::new(Vector2u::new(SCREEN_W / 2, SCREEN_H)),
             spell_creator: SpellCreator::new(
-                Vector2u::new(SCREEN_W / 2, SCREEN_H * 4 / 5),
+                Vector2u::new(SCREEN_W / 2, SCREEN_H * 8 / 9),
                 Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
             ),
             ui: Ui {
                 windows: vec![ui::Window {
                     parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    relative_position: Vector2f::new(0.5, 0.8),
-                    relative_size: Vector2f::new(0.5, 0.2),
-                    bg_color: Color::GREEN,
+                    relative_position: Vector2f::new(0.5, 8.0 / 9.0),
+                    relative_size: Vector2f::new(0.5, 1.0 / 9.0),
+                    bg_color: style::BACKGROUND_DARK_BLUE,
                     children: buttons,
                     ..Default::default()
                 }],

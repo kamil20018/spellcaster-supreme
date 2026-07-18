@@ -9,6 +9,7 @@ use crate::game::{
     component::{self, Circle, Hexagon, TilePosition, WorldPosition},
     constant::*,
     spawner::Spawner,
+    style,
 };
 
 pub struct PlayField {
@@ -32,7 +33,8 @@ impl PlayField {
     }
 
     pub fn update(&mut self) {
-        // draw::tiles(&mut self.render_texture, &mut self.world);
+        self.render_texture.clear(style::BACKGROUND_DARK_BLUE);
+
         for (world_position, hexagon) in self.world.query_mut::<(&WorldPosition, &Hexagon)>() {
             let mut circle = CircleShape::new(TILE_RADIUS * CIRCLE_SCALE, 6);
             circle.set_fill_color(hexagon.color);
@@ -41,7 +43,7 @@ impl PlayField {
             circle.set_rotation(30.);
             self.render_texture.draw(&circle);
         }
-        // draw::nature(&mut self.render_texture, &mut self.world);
+
         for (world_position, circle) in self.world.query_mut::<(&WorldPosition, &Circle)>() {
             let mut circle_shape = CircleShape::new(circle.radius, 16);
             circle_shape.set_fill_color(circle.color);
