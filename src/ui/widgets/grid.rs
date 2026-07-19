@@ -1,10 +1,11 @@
 use sfml::{
-    graphics::{Color, Drawable, RenderStates, RenderTarget},
+    cpp::FBox,
+    graphics::{Color, Drawable, RenderStates, RenderTarget, Texture},
     system::{Vector2f, Vector2i},
 };
 
 use crate::ui::{
-    event::UiEvent,
+    event::EventFromUi,
     padding::RelativePadding,
     traits::*,
     ui_id::{self, UiId},
@@ -64,8 +65,6 @@ impl CustomUi for Grid {
                             - self.padding.rows * (self.grid_size.y - 1) as f32)
                             / self.grid_size.y as f32,
                     );
-                    println!("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    eprintln!("child_relative_size = {:?}", child_relative_size);
                     let child_relative_position = Vector2f::new(
                         self.padding.left + col as f32 * (self.padding.columns + child_relative_size.x),
                         self.padding.top + row as f32 * (self.padding.rows + child_relative_size.y),
@@ -91,9 +90,9 @@ impl CustomUi for Grid {
         self.widget.render_texture.display();
     }
 
-    fn on_click(&self, click_pos: Vector2f) -> Option<Vec<UiEvent>> {
+    fn on_click(&self, click_pos: Vector2f) -> Option<Vec<EventFromUi>> {
         if self.widget.was_clicked(click_pos) && self.widget.clickable {
-            let mut events: Vec<UiEvent> = Vec::new();
+            let mut events: Vec<EventFromUi> = Vec::new();
             for child in &self.children {
                 if let Some(child_events) = child.on_click(click_pos) {
                     events.extend(child_events);
@@ -104,6 +103,28 @@ impl CustomUi for Grid {
             }
         }
         None
+    }
+
+    fn is_id(&self, id: UiId) -> bool {
+        self.id == id
+    }
+
+    fn contains_id(&self, _id: UiId) -> bool {
+        for child in &self.children {
+            if child.is_id(_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn set_background_texture(&mut self, id: UiId, texture: FBox<Texture>) {
+        for child in &mut self.children {
+            if child.is_id(id) || child.contains_id(id) {
+                child.set_background_texture(id, texture);
+                return;
+            }
+        }
     }
 }
 

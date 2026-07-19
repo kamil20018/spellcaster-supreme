@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 use sfml::{
     cpp::FBox,
     graphics::{Color, RenderTarget, RenderWindow},
@@ -23,10 +25,11 @@ mod spawner;
 mod style;
 
 use crate::{
+    game::asset_manager::SpellComponentTypes,
     helpers,
     ui::{
         self, Ui,
-        event::UiEvent,
+        event::{EventFromUi, EventToUi},
         padding::RelativePadding,
         traits::UiElement,
         ui_id::UiId,
@@ -45,14 +48,37 @@ pub struct Game {
     play_field: PlayField,
     spell_creator: SpellCreator,
     ui: Ui,
+    ui_mappings: UiMappings,
+    ui_state: UiState,
 }
 
-#[allow(unused)]
-#[derive(Clone, Copy)]
-struct ButtonHandles {
-    button_1: u64,
-    button_2: u64,
-    button_3: u64,
+pub struct UiMappings {
+    exit_button: UiId,
+    spell_components: HashMap<UiId, Option<SpellComponentTypes>>,
+    spell_grid: HashSet<UiId>,
+}
+
+impl UiMappings {
+    fn button_press(&self, id: UiId) -> Option<UiAction> {
+        if id == self.exit_button {
+            return Some(UiAction::ExitGame);
+        } else if let Some(Some(spell_component)) = self.spell_components.get(&id) {
+            return Some(UiAction::SelectedSpellComponent(*spell_component));
+        } else if self.spell_grid.contains(&id) {
+            return Some(UiAction::SpawnGridComponent);
+        }
+        None
+    }
+}
+
+enum UiAction {
+    ExitGame,
+    SelectedSpellComponent(SpellComponentTypes),
+    SpawnGridComponent,
+}
+
+pub struct UiState {
+    selected_spell_component: Option<SpellComponentTypes>,
 }
 
 impl Game {
@@ -67,13 +93,25 @@ impl Game {
         window.set_framerate_limit(60);
         window.set_position(Vector2i::new(270, 190));
 
-        let (buttons, _button_handles) = helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
+        let exit_button_id = UiId::new();
+        let exit_button = Box::new(Button {
+            relative_size: Vector2f::new(1.0, 1.0),
+            relative_position: Vector2f::new(0.0, 0.0),
+            id: exit_button_id,
+            ..Default::default()
+        });
 
+        let (buttons, spawn_spell_component_mappings) =
+            helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
+
+        let mut spell_component_grid_mappings = HashSet::new();
         let mut grid_buttons: Vec<Box<dyn UiElement>> = Vec::new();
         for _row in 0..11 {
             for _col in 0..11 {
+                let id = UiId::new();
+                spell_component_grid_mappings.insert(id);
                 grid_buttons.push(Box::new(Button {
-                    id: UiId::new(),
+                    id: id,
                     bg_color: Color::RED,
                     ..Default::default()
                 }));
@@ -89,6 +127,14 @@ impl Game {
             ),
             ui: Ui {
                 windows: vec![
+                    // exit button
+                    ui::Window {
+                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        relative_position: Vector2f::new(0.0, 0.0),
+                        relative_size: Vector2f::new(0.1, 0.1),
+                        children: vec![exit_button],
+                        ..Default::default()
+                    },
                     // spell component choice buttons
                     ui::Window {
                         parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
@@ -122,6 +168,14 @@ impl Game {
                     },
                 ],
                 ..Default::default()
+            },
+            ui_mappings: UiMappings {
+                spell_components: spawn_spell_component_mappings,
+                exit_button: exit_button_id,
+                spell_grid: spell_component_grid_mappings,
+            },
+            ui_state: UiState {
+                selected_spell_component: None,
             },
         }
     }
@@ -160,13 +214,33 @@ impl Game {
     }
 
     fn update(&mut self) {
+        while let Some(event) = self.ui.next_event() {
+            self.process_ui_event(&event);
+        }
         self.ui.update();
         self.play_field.update();
         self.spell_creator.update();
+    }
 
-        while let Some(event) = &self.ui.next_event() {
-            match event {
-                UiEvent::ButtonClicked(button_id) => println!("button_id from event {}", button_id.value()),
+    fn process_ui_event(&mut self, event: &EventFromUi) {
+        match event {
+            EventFromUi::ButtonClicked(button_id) => {
+                if let Some(ui_action) = self.ui_mappings.button_press(*button_id) {
+                    match ui_action {
+                        UiAction::ExitGame => self.window.close(),
+                        UiAction::SelectedSpellComponent(spell_component_types) => {
+                            self.ui_state.selected_spell_component = Some(spell_component_types)
+                        }
+                        UiAction::SpawnGridComponent => {
+                            if let Some(spell_component) = self.ui_state.selected_spell_component {
+                                self.ui.process_incoming_event(EventToUi::SetTexture(
+                                    *button_id,
+                                    spell_component.get_texture(),
+                                ))
+                            }
+                        }
+                    }
+                }
             }
         }
     }

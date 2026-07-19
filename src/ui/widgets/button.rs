@@ -4,7 +4,7 @@ use sfml::{
     system::Vector2f,
 };
 
-use crate::ui::{event::UiEvent, traits::*, ui_id::UiId, widget::*};
+use crate::ui::{event::EventFromUi, traits::*, ui_id::UiId, widget::*};
 
 pub struct Button {
     //actual user given stuff
@@ -38,17 +38,9 @@ impl Default for Button {
 impl UiElement for Button {}
 
 impl CustomUi for Button {
-    fn overwrite_relative(&mut self, relative_size: Vector2f, relative_position: Vector2f) {
-        self.relative_size = relative_size;
-        self.relative_position = relative_position;
-    }
-
     fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
-        eprintln!("parent_size = {:?}", parent_size);
-        eprintln!("parent_position = {:?}", parent_position);
         self.widget
             .init(parent_size, parent_position, self.relative_size, self.relative_position);
-        eprintln!("self.widget.real_size = {:?}", self.widget.real_size);
     }
 
     fn update(&mut self) {
@@ -73,11 +65,24 @@ impl CustomUi for Button {
         self.widget.render_texture.display();
     }
 
-    fn on_click(&self, click_pos: Vector2f) -> Option<Vec<UiEvent>> {
+    fn on_click(&self, click_pos: Vector2f) -> Option<Vec<EventFromUi>> {
         if self.widget.was_clicked(click_pos) {
-            return Some(vec![UiEvent::ButtonClicked(self.id)]);
+            return Some(vec![EventFromUi::ButtonClicked(self.id)]);
         }
         None
+    }
+
+    fn is_id(&self, id: UiId) -> bool {
+        id == self.id
+    }
+
+    fn set_background_texture(&mut self, id: UiId, texture: FBox<Texture>) {
+        self.texture = Some(texture);
+    }
+
+    fn overwrite_relative(&mut self, relative_size: Vector2f, relative_position: Vector2f) {
+        self.relative_size = relative_size;
+        self.relative_position = relative_position;
     }
 }
 
