@@ -4,6 +4,7 @@ use sfml::{
 };
 
 pub mod event;
+pub mod padding;
 pub mod traits;
 pub mod ui_id;
 pub mod widget;

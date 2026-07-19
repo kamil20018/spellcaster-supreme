@@ -24,7 +24,14 @@ mod style;
 
 use crate::{
     helpers,
-    ui::{self, Ui, event::UiEvent},
+    ui::{
+        self, Ui,
+        event::UiEvent,
+        padding::RelativePadding,
+        traits::UiElement,
+        ui_id,
+        widgets::{Button, Grid, grid},
+    },
 };
 
 impl From<&WorldPosition> for Vector2f {
@@ -62,6 +69,17 @@ impl Game {
 
         let (buttons, _button_handles) = helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
 
+        let mut grid_buttons: Vec<Box<dyn UiElement>> = Vec::new();
+        for _row in 0..11 {
+            for _col in 0..11 {
+                grid_buttons.push(Box::new(Button {
+                    id: ui_id::new_id(),
+                    bg_color: Color::RED,
+                    ..Default::default()
+                }));
+            }
+        }
+
         Game {
             window: window,
             play_field: PlayField::new(Vector2u::new(SCREEN_W / 2, SCREEN_H)),
@@ -70,14 +88,39 @@ impl Game {
                 Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
             ),
             ui: Ui {
-                windows: vec![ui::Window {
-                    parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    relative_position: Vector2f::new(0.5, 8.0 / 9.0),
-                    relative_size: Vector2f::new(0.5, 1.0 / 9.0),
-                    bg_color: style::BACKGROUND_DARK_BLUE,
-                    children: buttons,
-                    ..Default::default()
-                }],
+                windows: vec![
+                    // spell component choice buttons
+                    ui::Window {
+                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        relative_position: Vector2f::new(0.5, 8.0 / 9.0),
+                        relative_size: Vector2f::new(0.5, 1.0 / 9.0),
+                        bg_color: style::BACKGROUND_DARK_BLUE,
+                        children: buttons,
+                        ..Default::default()
+                    },
+                    // spell creator grid
+                    ui::Window {
+                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        relative_position: Vector2f::new(0.5, 0.0),
+                        relative_size: Vector2f::new(0.5, 8.0 / 9.0),
+                        bg_color: style::BACKGROUND_DARK_BLUE,
+                        children: vec![Box::new(Grid {
+                            grid_size: Vector2i::new(11, 11),
+                            relative_size: Vector2f::new(1.0, 1.0),
+                            children: grid_buttons,
+                            padding: RelativePadding {
+                                top: 0.005,
+                                botton: 0.005,
+                                left: 0.005,
+                                right: 0.005,
+                                columns: 0.005,
+                                rows: 0.005,
+                            },
+                            ..Default::default()
+                        })],
+                        ..Default::default()
+                    },
+                ],
                 ..Default::default()
             },
         }
@@ -131,7 +174,7 @@ impl Game {
     fn draw(&mut self) {
         self.window.clear(Color::rgb(2, 9, 46));
         self.window.draw(&self.play_field);
-        self.window.draw(&self.spell_creator);
+        // self.window.draw(&self.spell_creator);
         self.window.draw(&self.ui);
         self.window.display();
     }

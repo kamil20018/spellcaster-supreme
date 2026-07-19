@@ -38,9 +38,17 @@ impl Default for Button {
 impl UiElement for Button {}
 
 impl CustomUi for Button {
+    fn overwrite_relative(&mut self, relative_size: Vector2f, relative_position: Vector2f) {
+        self.relative_size = relative_size;
+        self.relative_position = relative_position;
+    }
+
     fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
+        eprintln!("parent_size = {:?}", parent_size);
+        eprintln!("parent_position = {:?}", parent_position);
         self.widget
             .init(parent_size, parent_position, self.relative_size, self.relative_position);
+        eprintln!("self.widget.real_size = {:?}", self.widget.real_size);
     }
 
     fn update(&mut self) {
@@ -58,7 +66,7 @@ impl CustomUi for Button {
 
         if let Some(button_text) = &self.text {
             let font = Font::from_file("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf").unwrap();
-            let mut text = Text::new(button_text, &font, 12);
+            let mut text = Text::new(button_text, &font, 15);
             text.set_position(self.widget.center_text(text.local_bounds()));
             self.widget.render_texture.draw(&text);
         }
