@@ -148,10 +148,10 @@ impl Game {
                         ..Default::default()
                     }),
                     // ui::Window {
-                        // parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                        // relative_position: Vector2f::new(0.5, 8.0 / 9.0),
-                        // relative_size: Vector2f::new(0.5, 1.0 / 9.0),
-                        // bg_color: style::BACKGROUND_DARK_BLUE,
+                    // parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                    // relative_position: Vector2f::new(0.5, 8.0 / 9.0),
+                    // relative_size: Vector2f::new(0.5, 1.0 / 9.0),
+                    // bg_color: style::BACKGROUND_DARK_BLUE,
                     //     children: buttons,
                     //     ..Default::default()
                     // },
