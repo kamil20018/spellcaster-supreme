@@ -76,7 +76,7 @@ impl CustomUi for Button {
         id == self.id
     }
 
-    fn set_background_texture(&mut self, id: UiId, texture: FBox<Texture>) {
+    fn set_background_texture(&mut self, _id: UiId, texture: FBox<Texture>) {
         self.texture = Some(texture);
     }
 

@@ -28,7 +28,7 @@ use crate::{
     game::asset_manager::SpellComponentTypes,
     helpers,
     ui::{
-        self, Ui,
+        Ui,
         event::{EventFromUi, EventToUi},
         padding::RelativePadding,
         traits::UiElement,
@@ -95,7 +95,7 @@ impl Game {
 
         let exit_button_id = UiId::new();
         let exit_button = Box::new(Button {
-            relative_size: Vector2f::new(1.0, 1.0),
+            relative_size: Vector2f::new(0.1, 0.1),
             relative_position: Vector2f::new(0.0, 0.0),
             id: exit_button_id,
             ..Default::default()
@@ -126,46 +126,52 @@ impl Game {
                 Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
             ),
             ui: Ui {
-                windows: vec![
+                parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                children: vec![
                     // exit button
-                    ui::Window {
-                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                        relative_position: Vector2f::new(0.0, 0.0),
-                        relative_size: Vector2f::new(0.1, 0.1),
-                        children: vec![exit_button],
-                        ..Default::default()
-                    },
+                    exit_button,
                     // spell component choice buttons
-                    ui::Window {
-                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                    Box::new(Grid {
+                        grid_size: Vector2i::new(5, 2),
                         relative_position: Vector2f::new(0.5, 8.0 / 9.0),
                         relative_size: Vector2f::new(0.5, 1.0 / 9.0),
                         bg_color: style::BACKGROUND_DARK_BLUE,
                         children: buttons,
+                        padding: RelativePadding {
+                            top: 0.0,
+                            botton: 0.02,
+                            left: 0.005,
+                            right: 0.005,
+                            columns: 0.005,
+                            rows: 0.02,
+                        },
                         ..Default::default()
-                    },
+                    }),
+                    // ui::Window {
+                        // parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                        // relative_position: Vector2f::new(0.5, 8.0 / 9.0),
+                        // relative_size: Vector2f::new(0.5, 1.0 / 9.0),
+                        // bg_color: style::BACKGROUND_DARK_BLUE,
+                    //     children: buttons,
+                    //     ..Default::default()
+                    // },
                     // spell creator grid
-                    ui::Window {
-                        parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                        relative_position: Vector2f::new(0.5, 0.0),
+                    Box::new(Grid {
+                        grid_size: Vector2i::new(11, 11),
                         relative_size: Vector2f::new(0.5, 8.0 / 9.0),
+                        relative_position: Vector2f::new(0.5, 0.0),
                         bg_color: style::BACKGROUND_DARK_BLUE,
-                        children: vec![Box::new(Grid {
-                            grid_size: Vector2i::new(11, 11),
-                            relative_size: Vector2f::new(1.0, 1.0),
-                            children: grid_buttons,
-                            padding: RelativePadding {
-                                top: 0.005,
-                                botton: 0.005,
-                                left: 0.005,
-                                right: 0.005,
-                                columns: 0.005,
-                                rows: 0.005,
-                            },
-                            ..Default::default()
-                        })],
+                        children: grid_buttons,
+                        padding: RelativePadding {
+                            top: 0.005,
+                            botton: 0.005,
+                            left: 0.005,
+                            right: 0.005,
+                            columns: 0.005,
+                            rows: 0.005,
+                        },
                         ..Default::default()
-                    },
+                    }),
                 ],
                 ..Default::default()
             },

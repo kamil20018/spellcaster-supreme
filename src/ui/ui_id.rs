@@ -13,8 +13,4 @@ impl UiId {
     pub fn new_none() -> Self {
         Self(0)
     }
-
-    pub fn value(&self) -> u64 {
-        self.0
-    }
 }

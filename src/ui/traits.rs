@@ -23,5 +23,5 @@ pub trait CustomUi {
         println!("overwrite_rel ignored, no implementation provided");
     }
 
-    fn set_background_texture(&mut self, id: UiId, texture: FBox<Texture>) {}
+    fn set_background_texture(&mut self, _id: UiId, _texture: FBox<Texture>) {}
 }
