@@ -29,8 +29,8 @@ use crate::{
         event::UiEvent,
         padding::RelativePadding,
         traits::UiElement,
-        ui_id,
-        widgets::{Button, Grid, grid},
+        ui_id::UiId,
+        widgets::{Button, Grid},
     },
 };
 
@@ -73,7 +73,7 @@ impl Game {
         for _row in 0..11 {
             for _col in 0..11 {
                 grid_buttons.push(Box::new(Button {
-                    id: ui_id::new_id(),
+                    id: UiId::new(),
                     bg_color: Color::RED,
                     ..Default::default()
                 }));
@@ -166,7 +166,7 @@ impl Game {
 
         while let Some(event) = &self.ui.next_event() {
             match event {
-                UiEvent::ButtonClicked(button_id) => println!("button_id from event {}", button_id),
+                UiEvent::ButtonClicked(button_id) => println!("button_id from event {}", button_id.value()),
             }
         }
     }

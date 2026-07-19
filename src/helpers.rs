@@ -3,7 +3,7 @@ use strum::IntoEnumIterator;
 
 use crate::{
     game::asset_manager::SpellComponentTypes,
-    ui::{self, ui_id, widgets::*},
+    ui::{self, ui_id::UiId, widgets::*},
 };
 
 pub fn spawn_button_grid(
@@ -11,9 +11,9 @@ pub fn spawn_button_grid(
     cols: usize,
     rel_padding: Vector2f,
     padding_sides: bool,
-) -> (Vec<Box<dyn ui::traits::UiElement>>, Vec<Vec<u64>>) {
+) -> (Vec<Box<dyn ui::traits::UiElement>>, Vec<Vec<UiId>>) {
     let mut buttons: Vec<Box<dyn ui::traits::UiElement>> = Vec::new();
-    let mut ids: Vec<Vec<u64>> = Vec::new();
+    let mut ids: Vec<Vec<UiId>> = Vec::new();
 
     let mut relative_size = Vector2f::new(
         (1.0 - rel_padding.x * (cols + 1) as f32) / cols as f32,
@@ -29,7 +29,7 @@ pub fn spawn_button_grid(
     for row in 0..rows {
         ids.push(Vec::new());
         for col in 0..cols {
-            let id = ui_id::new_id();
+            let id = UiId::new();
             let mut relative_position = Vector2f::new(
                 col as f32 * (relative_size.x + rel_padding.x) + rel_padding.x,
                 row as f32 * (relative_size.y + rel_padding.y) + rel_padding.y,

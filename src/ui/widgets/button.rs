@@ -4,14 +4,14 @@ use sfml::{
     system::Vector2f,
 };
 
-use crate::ui::{event::UiEvent, traits::*, widget::*};
+use crate::ui::{event::UiEvent, traits::*, ui_id::UiId, widget::*};
 
 pub struct Button {
     //actual user given stuff
     pub relative_size: Vector2f,
     pub relative_position: Vector2f,
     pub bg_color: Color,
-    pub id: u64,
+    pub id: UiId,
     pub texture: Option<FBox<Texture>>,
     pub text: Option<String>,
     //calculated / processed later
@@ -24,7 +24,7 @@ impl Default for Button {
             relative_size: Vector2f::new(0.0, 0.0),
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
-            id: 0,
+            id: UiId::new_none(),
             texture: None,
             text: None,
             widget: WidgetData {

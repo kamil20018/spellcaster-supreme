@@ -3,14 +3,20 @@ use sfml::{
     system::{Vector2f, Vector2i},
 };
 
-use crate::ui::{event::UiEvent, padding::RelativePadding, traits::*, widget::*};
+use crate::ui::{
+    event::UiEvent,
+    padding::RelativePadding,
+    traits::*,
+    ui_id::{self, UiId},
+    widget::*,
+};
 
 pub struct Grid {
     //actual user given stuff
     pub relative_size: Vector2f,
     pub relative_position: Vector2f,
     pub bg_color: Color,
-    pub id: u64,
+    pub id: ui_id::UiId,
     pub grid_size: Vector2i,
     pub padding: RelativePadding,
 
@@ -25,7 +31,7 @@ impl Default for Grid {
             relative_size: Vector2f::new(0.0, 0.0),
             relative_position: Vector2f::new(0.0, 0.0),
             bg_color: Color::rgb(100, 100, 100),
-            id: 0,
+            id: UiId::new_none(),
             grid_size: Vector2i::new(2, 2),
             padding: RelativePadding { ..Default::default() },
             children: Vec::new(),

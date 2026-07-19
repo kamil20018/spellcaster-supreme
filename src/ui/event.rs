@@ -1,3 +1,5 @@
+use crate::ui::ui_id::UiId;
+
 pub enum UiEvent {
-    ButtonClicked(u64),
+    ButtonClicked(UiId),
 }
