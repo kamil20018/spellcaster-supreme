@@ -24,10 +24,12 @@ use constant::*;
 mod spawner;
 mod style;
 
+use crate::boxed_vec;
 use crate::{
     game::asset_manager::SpellComponentTypes,
     helpers,
     ui::{
+        // macros,
         Ui,
         event::{EventFromUi, EventToUi},
         padding::RelativePadding,
@@ -94,11 +96,7 @@ impl<'a> Game<'a> {
         window.set_position(Vector2i::new(270, 190));
 
         let exit_button_id = UiId::new();
-        let exit_button = Box::new(Button::new(
-            Vector2f::new(0.1, 0.1),
-            Vector2f::new(0.0, 0.0),
-            exit_button_id,
-        ));
+        let exit_button = Button::new(Vector2f::new(0.1, 0.1), Vector2f::new(0.0, 0.0), exit_button_id);
 
         let (buttons, spawn_spell_component_mappings) = helpers::spawn_spell_component_selector_buttons(10);
 
@@ -124,47 +122,43 @@ impl<'a> Game<'a> {
             ),
             ui: Ui::new(
                 Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                vec![
+                boxed_vec![
                     // exit button
                     exit_button,
                     // spell component choice buttons
-                    Box::new(
-                        Grid::new(
-                            Vector2f::new(0.5, 1.0 / 9.0),
-                            Vector2f::new(0.5, 8.0 / 9.0),
-                            UiId::new(),
-                            Vector2i::new(5, 2),
-                            RelativePadding {
-                                top: 0.0,
-                                botton: 0.02,
-                                left: 0.005,
-                                right: 0.005,
-                                columns: 0.005,
-                                rows: 0.02,
-                            },
-                            buttons,
-                        )
-                        .set_bg_color(style::BACKGROUND_DARK_BLUE),
-                    ),
+                    Grid::new(
+                        Vector2f::new(0.5, 1.0 / 9.0),
+                        Vector2f::new(0.5, 8.0 / 9.0),
+                        UiId::new(),
+                        Vector2i::new(5, 2),
+                        RelativePadding {
+                            top: 0.0,
+                            botton: 0.02,
+                            left: 0.005,
+                            right: 0.005,
+                            columns: 0.005,
+                            rows: 0.02,
+                        },
+                        buttons,
+                    )
+                    .set_bg_color(style::BACKGROUND_DARK_BLUE),
                     // spell creator grid
-                    Box::new(
-                        Grid::new(
-                            Vector2f::new(0.5, 8.0 / 9.0),
-                            Vector2f::new(0.5, 0.0),
-                            UiId::new(),
-                            Vector2i::new(11, 11),
-                            RelativePadding {
-                                top: 0.005,
-                                botton: 0.005,
-                                left: 0.005,
-                                right: 0.005,
-                                columns: 0.005,
-                                rows: 0.005,
-                            },
-                            grid_buttons,
-                        )
-                        .set_bg_color(style::BACKGROUND_DARK_BLUE),
-                    ),
+                    Grid::new(
+                        Vector2f::new(0.5, 8.0 / 9.0),
+                        Vector2f::new(0.5, 0.0),
+                        UiId::new(),
+                        Vector2i::new(11, 11),
+                        RelativePadding {
+                            top: 0.005,
+                            botton: 0.005,
+                            left: 0.005,
+                            right: 0.005,
+                            columns: 0.005,
+                            rows: 0.005,
+                        },
+                        grid_buttons,
+                    )
+                    .set_bg_color(style::BACKGROUND_DARK_BLUE),
                 ],
             ),
             ui_mappings: UiMappings {
