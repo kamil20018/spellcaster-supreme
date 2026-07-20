@@ -102,8 +102,7 @@ impl<'a> Game<'a> {
             ..Default::default()
         });
 
-        let (buttons, spawn_spell_component_mappings) =
-            helpers::spawn_button_grid(2, 9, Vector2f::new(0.005, 0.05), false);
+        let (buttons, spawn_spell_component_mappings) = helpers::spawn_spell_component_selector_buttons(10);
 
         let mut spell_component_grid_mappings = HashSet::new();
         let mut grid_buttons: Vec<Box<dyn UiElement>> = Vec::new();
