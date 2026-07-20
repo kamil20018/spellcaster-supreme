@@ -96,7 +96,8 @@ impl<'a> Game<'a> {
         window.set_position(Vector2i::new(270, 190));
 
         let exit_button_id = UiId::new();
-        let exit_button = Button::new(Vector2f::new(0.1, 0.1), Vector2f::new(0.0, 0.0), exit_button_id);
+        let exit_button = Button::new(Vector2f::new(0.1, 0.1), Vector2f::new(0.0, 0.0), exit_button_id)
+            .set_bg_color(Color::rgb(100, 100, 100));
 
         let (buttons, spawn_spell_component_mappings) = helpers::spawn_spell_component_selector_buttons(10);
 

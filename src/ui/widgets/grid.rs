@@ -4,19 +4,10 @@ use sfml::{
     system::{Vector2f, Vector2i},
 };
 
-use crate::ui::{
-    event::EventFromUi,
-    padding::RelativePadding,
-    traits::*,
-    ui_id::{self, UiId},
-    widget::*,
-};
+use crate::ui::{event::EventFromUi, padding::RelativePadding, traits::*, ui_id::UiId, widget::*};
 
 pub struct Grid<'a> {
     //actual user given stuff
-    relative_size: Vector2f,
-    relative_position: Vector2f,
-    id: ui_id::UiId,
     grid_size: Vector2i,
     padding: RelativePadding,
     children: Vec<Box<dyn UiElement>>,
@@ -34,12 +25,12 @@ impl<'a> Grid<'a> {
         children: Vec<Box<dyn UiElement>>,
     ) -> Self {
         Self {
-            relative_size,
-            relative_position,
             grid_size,
             padding,
             children,
             widget: WidgetData {
+                relative_size,
+                relative_position,
                 id: id,
                 ..Default::default()
             },
@@ -56,14 +47,13 @@ impl<'a> Grid<'a> {
 impl<'a> Default for Grid<'a> {
     fn default() -> Self {
         Self {
-            relative_size: Vector2f::new(0.0, 0.0),
-            relative_position: Vector2f::new(0.0, 0.0),
             // bg_color: Color::rgb(100, 100, 100),
-            id: UiId::new_none(),
             grid_size: Vector2i::new(2, 2),
             padding: RelativePadding { ..Default::default() },
             children: Vec::new(),
             widget: WidgetData {
+                relative_size: Vector2f::new(0.0, 0.0),
+                relative_position: Vector2f::new(0.0, 0.0),
                 clickable: true,
                 ..Default::default()
             },
@@ -75,8 +65,7 @@ impl<'a> UiElement for Grid<'a> {}
 
 impl<'a> CustomUi for Grid<'a> {
     fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
-        self.widget
-            .init(parent_size, parent_position, self.relative_size, self.relative_position);
+        self.widget.init(parent_size, parent_position);
 
         //positioning children
         for row in 0..self.grid_size.y {
@@ -126,7 +115,7 @@ impl<'a> CustomUi for Grid<'a> {
     }
 
     fn is_id(&self, id: UiId) -> bool {
-        self.id == id
+        self.widget.id == id
     }
 
     fn contains_id(&self, _id: UiId) -> bool {

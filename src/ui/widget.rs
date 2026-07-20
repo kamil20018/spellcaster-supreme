@@ -8,6 +8,8 @@ use crate::ui::ui_id::UiId;
 pub struct WidgetData<'a> {
     pub real_size: Vector2f,
     pub real_position: Vector2f,
+    pub relative_size: Vector2f,
+    pub relative_position: Vector2f,
     pub texture_position: Vector2f,
     pub id: UiId,
     pub background: RectangleShape<'a>,
@@ -20,6 +22,8 @@ impl<'a> Default for WidgetData<'a> {
         Self {
             real_size: Vector2f::new(0.0, 0.0),
             real_position: Vector2f::new(0.0, 0.0),
+            relative_size: Vector2f::new(0.0, 0.0),
+            relative_position: Vector2f::new(0.0, 0.0),
             texture_position: Vector2f::new(0.0, 0.0),
             id: UiId::new_none(),
             background: RectangleShape::new(),
@@ -30,19 +34,19 @@ impl<'a> Default for WidgetData<'a> {
 }
 
 impl<'a> WidgetData<'a> {
-    pub fn init(
-        &mut self,
-        parent_size: Vector2f,
-        parent_position: Vector2f,
-        relative_size: Vector2f,
-        relative_position: Vector2f,
-    ) {
-        self.real_size = Vector2f::new(parent_size.x * relative_size.x, parent_size.y * relative_size.y);
-        self.real_position = Vector2f::new(
-            parent_position.x + relative_position.x * parent_size.x,
-            parent_position.y + relative_position.y * parent_size.y,
+    pub fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
+        self.real_size = Vector2f::new(
+            parent_size.x * self.relative_size.x,
+            parent_size.y * self.relative_size.y,
         );
-        self.texture_position = Vector2f::new(parent_size.x * relative_position.x, parent_size.y * relative_position.y);
+        self.real_position = Vector2f::new(
+            parent_position.x + self.relative_position.x * parent_size.x,
+            parent_position.y + self.relative_position.y * parent_size.y,
+        );
+        self.texture_position = Vector2f::new(
+            parent_size.x * self.relative_position.x,
+            parent_size.y * self.relative_position.y,
+        );
         self.background.set_size(self.real_size);
         self.background.set_position(self.real_position);
         self.background.set_fill_color(self.bg_color);

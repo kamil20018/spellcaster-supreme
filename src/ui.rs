@@ -37,12 +37,7 @@ impl<'a> Ui<'a> {
     }
 
     fn init(&mut self) {
-        self.widget.init(
-            self.parent_size,
-            Vector2f::new(0.0, 0.0),
-            Vector2f::new(1.0, 1.0),
-            Vector2f::new(0.0, 0.0),
-        );
+        self.widget.init(self.parent_size, Vector2f::new(0.0, 0.0));
 
         for child in &mut self.children {
             child.init(self.widget.real_size, self.widget.real_position);
@@ -96,6 +91,8 @@ impl<'a> Default for Ui<'a> {
             parent_size: Vector2f::new(0.0, 0.0),
             render_texture: RenderTexture::new(1, 1).unwrap(),
             widget: WidgetData {
+                relative_size: Vector2f::new(1.0, 1.0),
+                relative_position: Vector2f::new(0.0, 0.0),
                 clickable: true,
                 ..Default::default()
             },

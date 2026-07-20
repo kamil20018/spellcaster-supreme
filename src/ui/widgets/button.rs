@@ -8,8 +8,6 @@ use crate::ui::{event::EventFromUi, traits::*, ui_id::UiId, widget::*};
 
 pub struct Button<'a> {
     //actual user given stuff
-    relative_size: Vector2f,
-    relative_position: Vector2f,
     texture: Option<FBox<Texture>>,
     text: Option<String>,
     //calculated / processed later
@@ -19,9 +17,9 @@ pub struct Button<'a> {
 impl<'a> Button<'a> {
     pub fn new(relative_size: Vector2f, relative_position: Vector2f, id: UiId) -> Self {
         Self {
-            relative_size,
-            relative_position,
             widget: WidgetData {
+                relative_size,
+                relative_position,
                 id: id,
                 ..Default::default()
             },
@@ -43,8 +41,6 @@ impl<'a> Button<'a> {
 impl<'a> Default for Button<'a> {
     fn default() -> Self {
         Self {
-            relative_size: Vector2f::new(0.0, 0.0),
-            relative_position: Vector2f::new(0.0, 0.0),
             texture: None,
             text: None,
             widget: WidgetData {
@@ -59,8 +55,7 @@ impl<'a> UiElement for Button<'a> {}
 
 impl<'a> CustomUi for Button<'a> {
     fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
-        self.widget
-            .init(parent_size, parent_position, self.relative_size, self.relative_position);
+        self.widget.init(parent_size, parent_position);
     }
 
     fn update(&mut self) {}
@@ -81,8 +76,8 @@ impl<'a> CustomUi for Button<'a> {
     }
 
     fn overwrite_relative(&mut self, relative_size: Vector2f, relative_position: Vector2f) {
-        self.relative_size = relative_size;
-        self.relative_position = relative_position;
+        self.widget.relative_size = relative_size;
+        self.widget.relative_position = relative_position;
     }
 }
 
