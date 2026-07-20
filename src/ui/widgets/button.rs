@@ -27,6 +27,16 @@ impl<'a> Button<'a> {
         }
     }
 
+    pub fn new_dynamic(id: UiId) -> Self {
+        Self {
+            widget: WidgetData {
+                id,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
     pub fn set_text(mut self, text: String) -> Self {
         self.text = Some(text);
         self

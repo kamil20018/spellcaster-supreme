@@ -108,7 +108,7 @@ impl<'a> Game<'a> {
                 let id = UiId::new();
                 spell_component_grid_mappings.insert(id);
                 grid_buttons.push(Box::new(
-                    Button::new(Vector2f::new(100.0, 100.0), Vector2f::new(100.0, 100.0), id)
+                    Button::new_dynamic(id)
                         .set_bg_color(Color::WHITE),
                 ));
             }

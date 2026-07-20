@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use sfml::{graphics::Color, system::Vector2f};
+use sfml::graphics::Color;
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -30,9 +30,7 @@ pub fn spawn_spell_component_selector_buttons(
             ids.insert(id.clone(), None);
         }
 
-        //TODO: add constructor for buttons w/0 rel sizing
-        let mut button = Button::new(Vector2f::new(100.0, 100.0), Vector2f::new(100.0, 100.0), id)
-            .set_bg_color(Color::rgb(100, 100, 100));
+        let mut button = Button::new_dynamic(id).set_bg_color(Color::rgb(100, 100, 100));
         if let Some(text) = text {
             button = button.set_text(text);
         }
