@@ -1,6 +1,6 @@
 use sfml::{
     cpp::FBox,
-    graphics::{Drawable, RenderStates, RenderTarget, Texture},
+    graphics::{Color, Drawable, RenderStates, RenderTarget, Texture},
     system::{Vector2f, Vector2i},
 };
 
@@ -14,15 +14,43 @@ use crate::ui::{
 
 pub struct Grid<'a> {
     //actual user given stuff
-    pub relative_size: Vector2f,
-    pub relative_position: Vector2f,
-    pub id: ui_id::UiId,
-    pub grid_size: Vector2i,
-    pub padding: RelativePadding,
-
-    pub children: Vec<Box<dyn UiElement>>,
+    relative_size: Vector2f,
+    relative_position: Vector2f,
+    id: ui_id::UiId,
+    grid_size: Vector2i,
+    padding: RelativePadding,
+    children: Vec<Box<dyn UiElement>>,
     //calculated / processed later
-    pub widget: WidgetData<'a>,
+    widget: WidgetData<'a>,
+}
+
+impl<'a> Grid<'a> {
+    pub fn new(
+        relative_size: Vector2f,
+        relative_position: Vector2f,
+        id: UiId,
+        grid_size: Vector2i,
+        padding: RelativePadding,
+        children: Vec<Box<dyn UiElement>>,
+    ) -> Self {
+        Self {
+            relative_size,
+            relative_position,
+            grid_size,
+            padding,
+            children,
+            widget: WidgetData {
+                id: id,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
+    pub fn set_bg_color(mut self, color: Color) -> Self {
+        self.widget.bg_color = color;
+        self
+    }
 }
 
 impl<'a> Default for Grid<'a> {

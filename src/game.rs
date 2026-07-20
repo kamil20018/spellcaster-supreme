@@ -33,7 +33,6 @@ use crate::{
         padding::RelativePadding,
         traits::UiElement,
         ui_id::UiId,
-        widget::WidgetData,
         widgets::{Button, Grid},
     },
 };
@@ -129,45 +128,43 @@ impl<'a> Game<'a> {
                     // exit button
                     exit_button,
                     // spell component choice buttons
-                    Box::new(Grid {
-                        grid_size: Vector2i::new(5, 2),
-                        relative_position: Vector2f::new(0.5, 8.0 / 9.0),
-                        relative_size: Vector2f::new(0.5, 1.0 / 9.0),
-                        children: buttons,
-                        padding: RelativePadding {
-                            top: 0.0,
-                            botton: 0.02,
-                            left: 0.005,
-                            right: 0.005,
-                            columns: 0.005,
-                            rows: 0.02,
-                        },
-                        widget: WidgetData {
-                            bg_color: style::BACKGROUND_DARK_BLUE,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }),
+                    Box::new(
+                        Grid::new(
+                            Vector2f::new(0.5, 1.0 / 9.0),
+                            Vector2f::new(0.5, 8.0 / 9.0),
+                            UiId::new(),
+                            Vector2i::new(5, 2),
+                            RelativePadding {
+                                top: 0.0,
+                                botton: 0.02,
+                                left: 0.005,
+                                right: 0.005,
+                                columns: 0.005,
+                                rows: 0.02,
+                            },
+                            buttons,
+                        )
+                        .set_bg_color(style::BACKGROUND_DARK_BLUE),
+                    ),
                     // spell creator grid
-                    Box::new(Grid {
-                        grid_size: Vector2i::new(11, 11),
-                        relative_size: Vector2f::new(0.5, 8.0 / 9.0),
-                        relative_position: Vector2f::new(0.5, 0.0),
-                        children: grid_buttons,
-                        padding: RelativePadding {
-                            top: 0.005,
-                            botton: 0.005,
-                            left: 0.005,
-                            right: 0.005,
-                            columns: 0.005,
-                            rows: 0.005,
-                        },
-                        widget: WidgetData {
-                            bg_color: style::BACKGROUND_DARK_BLUE,
-                            ..Default::default()
-                        },
-                        ..Default::default()
-                    }),
+                    Box::new(
+                        Grid::new(
+                            Vector2f::new(0.5, 8.0 / 9.0),
+                            Vector2f::new(0.5, 0.0),
+                            UiId::new(),
+                            Vector2i::new(11, 11),
+                            RelativePadding {
+                                top: 0.005,
+                                botton: 0.005,
+                                left: 0.005,
+                                right: 0.005,
+                                columns: 0.005,
+                                rows: 0.005,
+                            },
+                            grid_buttons,
+                        )
+                        .set_bg_color(style::BACKGROUND_DARK_BLUE),
+                    ),
                 ],
             ),
             ui_mappings: UiMappings {
