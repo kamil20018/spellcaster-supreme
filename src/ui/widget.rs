@@ -3,10 +3,13 @@ use sfml::{
     system::Vector2f,
 };
 
+use crate::ui::ui_id::UiId;
+
 pub struct WidgetData<'a> {
     pub real_size: Vector2f,
     pub real_position: Vector2f,
     pub texture_position: Vector2f,
+    pub id: UiId,
     pub background: RectangleShape<'a>,
     pub bg_color: Color,
     pub clickable: bool,
@@ -18,6 +21,7 @@ impl<'a> Default for WidgetData<'a> {
             real_size: Vector2f::new(0.0, 0.0),
             real_position: Vector2f::new(0.0, 0.0),
             texture_position: Vector2f::new(0.0, 0.0),
+            id: UiId::new_none(),
             background: RectangleShape::new(),
             bg_color: Color::TRANSPARENT,
             clickable: true,

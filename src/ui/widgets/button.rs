@@ -1,6 +1,6 @@
 use sfml::{
     cpp::FBox,
-    graphics::{Drawable, Font, RenderStates, RenderTarget, Sprite, Text, Texture, Transformable},
+    graphics::{Color, Drawable, Font, RenderStates, RenderTarget, Sprite, Text, Texture, Transformable},
     system::Vector2f,
 };
 
@@ -8,13 +8,36 @@ use crate::ui::{event::EventFromUi, traits::*, ui_id::UiId, widget::*};
 
 pub struct Button<'a> {
     //actual user given stuff
-    pub relative_size: Vector2f,
-    pub relative_position: Vector2f,
-    pub id: UiId,
-    pub texture: Option<FBox<Texture>>,
-    pub text: Option<String>,
+    relative_size: Vector2f,
+    relative_position: Vector2f,
+    texture: Option<FBox<Texture>>,
+    text: Option<String>,
     //calculated / processed later
-    pub widget: WidgetData<'a>,
+    widget: WidgetData<'a>,
+}
+
+impl<'a> Button<'a> {
+    pub fn new(relative_size: Vector2f, relative_position: Vector2f, id: UiId) -> Self {
+        Self {
+            relative_size,
+            relative_position,
+            widget: WidgetData {
+                id: id,
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
+    pub fn set_text(mut self, text: String) -> Self {
+        self.text = Some(text);
+        self
+    }
+
+    pub fn set_bg_color(mut self, color: Color) -> Self {
+        self.widget.bg_color = color;
+        self
+    }
 }
 
 impl<'a> Default for Button<'a> {
@@ -22,7 +45,6 @@ impl<'a> Default for Button<'a> {
         Self {
             relative_size: Vector2f::new(0.0, 0.0),
             relative_position: Vector2f::new(0.0, 0.0),
-            id: UiId::new_none(),
             texture: None,
             text: None,
             widget: WidgetData {
@@ -45,13 +67,13 @@ impl<'a> CustomUi for Button<'a> {
 
     fn on_click(&self, click_pos: Vector2f) -> Option<Vec<EventFromUi>> {
         if self.widget.was_clicked(click_pos) {
-            return Some(vec![EventFromUi::ButtonClicked(self.id)]);
+            return Some(vec![EventFromUi::ButtonClicked(self.widget.id)]);
         }
         None
     }
 
     fn is_id(&self, id: UiId) -> bool {
-        id == self.id
+        id == self.widget.id
     }
 
     fn set_background_texture(&mut self, _id: UiId, texture: FBox<Texture>) {

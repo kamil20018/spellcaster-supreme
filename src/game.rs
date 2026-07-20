@@ -95,12 +95,11 @@ impl<'a> Game<'a> {
         window.set_position(Vector2i::new(270, 190));
 
         let exit_button_id = UiId::new();
-        let exit_button = Box::new(Button {
-            relative_size: Vector2f::new(0.1, 0.1),
-            relative_position: Vector2f::new(0.0, 0.0),
-            id: exit_button_id,
-            ..Default::default()
-        });
+        let exit_button = Box::new(Button::new(
+            Vector2f::new(0.1, 0.1),
+            Vector2f::new(0.0, 0.0),
+            exit_button_id,
+        ));
 
         let (buttons, spawn_spell_component_mappings) = helpers::spawn_spell_component_selector_buttons(10);
 
@@ -110,14 +109,10 @@ impl<'a> Game<'a> {
             for _col in 0..11 {
                 let id = UiId::new();
                 spell_component_grid_mappings.insert(id);
-                grid_buttons.push(Box::new(Button {
-                    id: id,
-                    widget: WidgetData {
-                        bg_color: Color::WHITE,
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                }));
+                grid_buttons.push(Box::new(
+                    Button::new(Vector2f::new(100.0, 100.0), Vector2f::new(100.0, 100.0), id)
+                        .set_bg_color(Color::WHITE),
+                ));
             }
         }
 
