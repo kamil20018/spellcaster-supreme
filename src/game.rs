@@ -125,9 +125,9 @@ impl Game {
                 Vector2u::new(SCREEN_W / 2, SCREEN_H * 8 / 9),
                 Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
             ),
-            ui: Ui {
-                parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                children: vec![
+            ui: Ui::new(
+                Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
+                vec![
                     // exit button
                     exit_button,
                     // spell component choice buttons
@@ -147,14 +147,6 @@ impl Game {
                         },
                         ..Default::default()
                     }),
-                    // ui::Window {
-                    // parent_size: Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
-                    // relative_position: Vector2f::new(0.5, 8.0 / 9.0),
-                    // relative_size: Vector2f::new(0.5, 1.0 / 9.0),
-                    // bg_color: style::BACKGROUND_DARK_BLUE,
-                    //     children: buttons,
-                    //     ..Default::default()
-                    // },
                     // spell creator grid
                     Box::new(Grid {
                         grid_size: Vector2i::new(11, 11),
@@ -173,8 +165,7 @@ impl Game {
                         ..Default::default()
                     }),
                 ],
-                ..Default::default()
-            },
+            ),
             ui_mappings: UiMappings {
                 spell_components: spawn_spell_component_mappings,
                 exit_button: exit_button_id,
@@ -196,7 +187,6 @@ impl Game {
     }
 
     fn init(&mut self) {
-        self.ui.init();
         self.play_field.init();
     }
 

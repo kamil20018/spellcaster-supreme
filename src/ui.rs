@@ -14,26 +14,29 @@ pub use event::EventFromUi;
 use crate::ui::{event::EventToUi, traits::UiElement, widget::WidgetData};
 
 pub struct Ui {
-    pub event_queue: Vec<EventFromUi>,
-
-    pub widget: WidgetData,
-
-    pub parent_size: Vector2f,
-    pub parent_position: Vector2f,
-    pub relative_size: Vector2f,
-    pub relative_position: Vector2f,
-    pub bg_color: Color,
-
-    pub children: Vec<Box<dyn UiElement>>,
+    parent_size: Vector2f,
+    children: Vec<Box<dyn UiElement>>,
+    event_queue: Vec<EventFromUi>,
+    widget: WidgetData,
 }
 
 impl Ui {
-    pub fn init(&mut self) {
+    pub fn new(parent_size: Vector2f, children: Vec<Box<dyn UiElement>>) -> Self {
+        let mut ui = Ui {
+            parent_size,
+            children,
+            ..Default::default()
+        };
+        ui.init();
+        ui
+    }
+
+    fn init(&mut self) {
         self.widget.init(
             self.parent_size,
-            self.parent_position,
-            self.relative_size,
-            self.relative_position,
+            Vector2f::new(0.0, 0.0),
+            Vector2f::new(1.0, 1.0),
+            Vector2f::new(0.0, 0.0),
         );
 
         for child in &mut self.children {
@@ -42,7 +45,7 @@ impl Ui {
     }
 
     pub fn update(&mut self) {
-        self.widget.render_texture.clear(self.bg_color);
+        self.widget.render_texture.clear(Color::TRANSPARENT);
         for child in &mut self.children {
             child.update();
         }
@@ -86,12 +89,6 @@ impl Default for Ui {
         Self {
             event_queue: Vec::new(),
             parent_size: Vector2f::new(0.0, 0.0),
-            parent_position: Vector2f::new(0.0, 0.0),
-            relative_size: Vector2f::new(1.0, 1.0),
-            relative_position: Vector2f::new(0.0, 0.0),
-
-            bg_color: Color::rgba(100, 100, 100, 0),
-
             widget: WidgetData {
                 clickable: true,
                 ..Default::default()
