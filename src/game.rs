@@ -33,6 +33,7 @@ use crate::{
         padding::RelativePadding,
         traits::UiElement,
         ui_id::UiId,
+        widget::WidgetData,
         widgets::{Button, Grid},
     },
 };
@@ -43,11 +44,11 @@ impl From<&WorldPosition> for Vector2f {
     }
 }
 
-pub struct Game {
+pub struct Game<'a> {
     window: FBox<RenderWindow>,
     play_field: PlayField,
     spell_creator: SpellCreator,
-    ui: Ui,
+    ui: Ui<'a>,
     ui_mappings: UiMappings,
     ui_state: UiState,
 }
@@ -81,7 +82,7 @@ pub struct UiState {
     selected_spell_component: Option<SpellComponentTypes>,
 }
 
-impl Game {
+impl<'a> Game<'a> {
     pub fn new() -> Self {
         let mut window: FBox<RenderWindow> = RenderWindow::new(
             VideoMode::new(SCREEN_W, SCREEN_H, 32),
@@ -112,7 +113,10 @@ impl Game {
                 spell_component_grid_mappings.insert(id);
                 grid_buttons.push(Box::new(Button {
                     id: id,
-                    bg_color: Color::RED,
+                    widget: WidgetData {
+                        bg_color: Color::WHITE,
+                        ..Default::default()
+                    },
                     ..Default::default()
                 }));
             }
@@ -135,7 +139,6 @@ impl Game {
                         grid_size: Vector2i::new(5, 2),
                         relative_position: Vector2f::new(0.5, 8.0 / 9.0),
                         relative_size: Vector2f::new(0.5, 1.0 / 9.0),
-                        bg_color: style::BACKGROUND_DARK_BLUE,
                         children: buttons,
                         padding: RelativePadding {
                             top: 0.0,
@@ -145,6 +148,10 @@ impl Game {
                             columns: 0.005,
                             rows: 0.02,
                         },
+                        widget: WidgetData {
+                            bg_color: style::BACKGROUND_DARK_BLUE,
+                            ..Default::default()
+                        },
                         ..Default::default()
                     }),
                     // spell creator grid
@@ -152,7 +159,6 @@ impl Game {
                         grid_size: Vector2i::new(11, 11),
                         relative_size: Vector2f::new(0.5, 8.0 / 9.0),
                         relative_position: Vector2f::new(0.5, 0.0),
-                        bg_color: style::BACKGROUND_DARK_BLUE,
                         children: grid_buttons,
                         padding: RelativePadding {
                             top: 0.005,
@@ -161,6 +167,10 @@ impl Game {
                             right: 0.005,
                             columns: 0.005,
                             rows: 0.005,
+                        },
+                        widget: WidgetData {
+                            bg_color: style::BACKGROUND_DARK_BLUE,
+                            ..Default::default()
                         },
                         ..Default::default()
                     }),
@@ -244,7 +254,6 @@ impl Game {
     fn draw(&mut self) {
         self.window.clear(Color::rgb(2, 9, 46));
         self.window.draw(&self.play_field);
-        // self.window.draw(&self.spell_creator);
         self.window.draw(&self.ui);
         self.window.display();
     }

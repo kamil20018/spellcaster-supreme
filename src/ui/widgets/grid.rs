@@ -1,6 +1,6 @@
 use sfml::{
     cpp::FBox,
-    graphics::{Color, Drawable, RenderStates, RenderTarget, Texture},
+    graphics::{Drawable, RenderStates, RenderTarget, Texture},
     system::{Vector2f, Vector2i},
 };
 
@@ -12,26 +12,25 @@ use crate::ui::{
     widget::*,
 };
 
-pub struct Grid {
+pub struct Grid<'a> {
     //actual user given stuff
     pub relative_size: Vector2f,
     pub relative_position: Vector2f,
-    pub bg_color: Color,
     pub id: ui_id::UiId,
     pub grid_size: Vector2i,
     pub padding: RelativePadding,
 
     pub children: Vec<Box<dyn UiElement>>,
     //calculated / processed later
-    pub widget: WidgetData,
+    pub widget: WidgetData<'a>,
 }
 
-impl Default for Grid {
+impl<'a> Default for Grid<'a> {
     fn default() -> Self {
         Self {
             relative_size: Vector2f::new(0.0, 0.0),
             relative_position: Vector2f::new(0.0, 0.0),
-            bg_color: Color::rgb(100, 100, 100),
+            // bg_color: Color::rgb(100, 100, 100),
             id: UiId::new_none(),
             grid_size: Vector2i::new(2, 2),
             padding: RelativePadding { ..Default::default() },
@@ -44,13 +43,14 @@ impl Default for Grid {
     }
 }
 
-impl UiElement for Grid {}
+impl<'a> UiElement for Grid<'a> {}
 
-impl CustomUi for Grid {
+impl<'a> CustomUi for Grid<'a> {
     fn init(&mut self, parent_size: Vector2f, parent_position: Vector2f) {
         self.widget
             .init(parent_size, parent_position, self.relative_size, self.relative_position);
 
+        //positioning children
         for row in 0..self.grid_size.y {
             for col in 0..self.grid_size.x {
                 let idx = row * self.grid_size.x + col;
@@ -77,17 +77,9 @@ impl CustomUi for Grid {
     }
 
     fn update(&mut self) {
-        self.widget.render_texture.clear(self.bg_color);
-
         for child in &mut self.children {
             child.update();
         }
-
-        for child in &self.children {
-            self.widget.render_texture.draw(child.as_ref());
-        }
-
-        self.widget.render_texture.display();
     }
 
     fn on_click(&self, click_pos: Vector2f) -> Option<Vec<EventFromUi>> {
@@ -128,12 +120,15 @@ impl CustomUi for Grid {
     }
 }
 
-impl Drawable for Grid {
+impl<'b> Drawable for Grid<'b> {
     fn draw<'a: 'shader, 'texture, 'shader, 'shader_texture>(
         &'a self,
         target: &mut dyn RenderTarget,
         states: &RenderStates<'texture, 'shader, 'shader_texture>,
     ) {
-        self.widget.draw(target, states);
+        target.draw_with_renderstates(&self.widget.background, states);
+        for child in &self.children {
+            target.draw_with_renderstates(child.as_ref(), states);
+        }
     }
 }

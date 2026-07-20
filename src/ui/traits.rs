@@ -25,3 +25,16 @@ pub trait CustomUi {
 
     fn set_background_texture(&mut self, _id: UiId, _texture: FBox<Texture>) {}
 }
+
+//TODO:
+// trait UiElement {
+//     fn init(&mut self, ...);
+
+//     fn as_container(&mut self) -> Option<&mut dyn UiContainer> {
+//         None
+//     }
+// }
+
+// trait UiContainer {
+//     fn children(&mut self) -> &mut Vec<Box<dyn UiElement>>;
+// }

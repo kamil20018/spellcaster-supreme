@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use sfml::system::Vector2f;
+use sfml::{graphics::Color, system::Vector2f};
 use strum::IntoEnumIterator;
 
 use crate::{
     game::asset_manager::SpellComponentTypes,
-    ui::{self, ui_id::UiId, widgets::*},
+    ui::{self, ui_id::UiId, widget::WidgetData, widgets::*},
 };
 
 pub fn spawn_button_grid(
@@ -57,6 +57,10 @@ pub fn spawn_button_grid(
                 relative_position: relative_position,
                 id: id,
                 text: text,
+                widget: WidgetData {
+                    bg_color: Color::rgb(100, 100, 100),
+                    ..Default::default()
+                },
                 ..Default::default()
             }));
         }

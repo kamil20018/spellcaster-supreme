@@ -1,5 +1,6 @@
 use sfml::{
-    graphics::{Color, Drawable, RenderStates, RenderTarget, Sprite, Transformable},
+    cpp::FBox,
+    graphics::{Color, Drawable, RenderStates, RenderTarget, RenderTexture, Sprite, Transformable},
     system::Vector2f,
 };
 
@@ -13,20 +14,22 @@ pub use event::EventFromUi;
 
 use crate::ui::{event::EventToUi, traits::UiElement, widget::WidgetData};
 
-pub struct Ui {
+pub struct Ui<'a> {
     parent_size: Vector2f,
     children: Vec<Box<dyn UiElement>>,
     event_queue: Vec<EventFromUi>,
-    widget: WidgetData,
+    widget: WidgetData<'a>,
+    render_texture: FBox<RenderTexture>,
 }
 
-impl Ui {
+impl<'a> Ui<'a> {
     pub fn new(parent_size: Vector2f, children: Vec<Box<dyn UiElement>>) -> Self {
         let mut ui = Ui {
             parent_size,
             children,
             ..Default::default()
         };
+        ui.render_texture = RenderTexture::new(parent_size.x as u32, parent_size.y as u32).unwrap();
         ui.init();
         ui
     }
@@ -45,15 +48,15 @@ impl Ui {
     }
 
     pub fn update(&mut self) {
-        self.widget.render_texture.clear(Color::TRANSPARENT);
+        self.render_texture.clear(Color::TRANSPARENT);
         for child in &mut self.children {
             child.update();
         }
 
         for child in &self.children {
-            self.widget.render_texture.draw(child.as_ref());
+            self.render_texture.draw(child.as_ref());
         }
-        self.widget.render_texture.display();
+        self.render_texture.display();
     }
 
     pub fn on_click(&mut self, click_pos: Vector2f) {
@@ -84,11 +87,12 @@ impl Ui {
     }
 }
 
-impl Default for Ui {
+impl<'a> Default for Ui<'a> {
     fn default() -> Self {
         Self {
             event_queue: Vec::new(),
             parent_size: Vector2f::new(0.0, 0.0),
+            render_texture: RenderTexture::new(1, 1).unwrap(),
             widget: WidgetData {
                 clickable: true,
                 ..Default::default()
@@ -99,14 +103,14 @@ impl Default for Ui {
     }
 }
 
-impl Drawable for Ui {
+impl<'b> Drawable for Ui<'b> {
     fn draw<'a: 'shader, 'texture, 'shader, 'shader_texture>(
         &'a self,
         target: &mut dyn RenderTarget,
         states: &RenderStates<'texture, 'shader, 'shader_texture>,
     ) {
-        let mut sprite = Sprite::with_texture(self.widget.render_texture.texture());
-        sprite.set_position(self.widget.real_position);
+        let mut sprite = Sprite::with_texture(self.render_texture.texture());
+        sprite.set_position(Vector2f::new(0.0, 0.0));
         target.draw_with_renderstates(&sprite, states);
     }
 }
