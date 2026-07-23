@@ -62,7 +62,12 @@ impl UiMappings {
             return Some(UiAction::ExitGame);
         } else if let Some(Some(spell_component)) = self.spell_components.get(&id) {
             return Some(UiAction::SelectedSpellComponent(*spell_component));
-        } else if self.spell_grid.contains(&id) {
+        }
+        None
+    }
+
+    fn grid_button_press(&self, id: UiId) -> Option<UiAction> {
+        if self.spell_grid.contains(&id) {
             return Some(UiAction::SpawnGridComponent);
         }
         None
@@ -211,6 +216,13 @@ impl<'a> Game<'a> {
                         UiAction::SelectedSpellComponent(spell_component_types) => {
                             self.ui_state.selected_spell_component = Some(spell_component_types)
                         }
+                        _ => {}
+                    }
+                }
+            }
+            EventFromUi::GridButtonClicked(button_id, grid_position) => {
+                if let Some(ui_action) = self.ui_mappings.grid_button_press(*button_id) {
+                    match ui_action {
                         UiAction::SpawnGridComponent => {
                             if let Some(spell_component) = self.ui_state.selected_spell_component {
                                 self.ui.process_incoming_event(EventToUi::SetTexture(
@@ -218,7 +230,9 @@ impl<'a> Game<'a> {
                                     spell_component.get_texture(),
                                 ))
                             }
+                            eprintln!("grid_position = {:?}", grid_position);
                         }
+                        _ => {}
                     }
                 }
             }

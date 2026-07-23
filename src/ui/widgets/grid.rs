@@ -4,7 +4,13 @@ use sfml::{
     system::{Vector2f, Vector2i},
 };
 
-use crate::ui::{event::EventFromUi, padding::RelativePadding, traits::*, ui_id::UiId, widget::*};
+use crate::ui::{
+    event::{EventFromUi, GridPosition},
+    padding::RelativePadding,
+    traits::*,
+    ui_id::UiId,
+    widget::*,
+};
 
 pub struct Grid<'a> {
     //actual user given stuff
@@ -102,9 +108,20 @@ impl<'a> CustomUi for Grid<'a> {
     fn on_click(&self, click_pos: Vector2f) -> Option<Vec<EventFromUi>> {
         if self.widget.was_clicked(click_pos) && self.widget.clickable {
             let mut events: Vec<EventFromUi> = Vec::new();
-            for child in &self.children {
+            for (counter, child) in self.children.iter().enumerate() {
                 if let Some(child_events) = child.on_click(click_pos) {
-                    events.extend(child_events);
+                    for event in child_events {
+                        if let EventFromUi::ButtonClicked(id) = event {
+                            events.push(EventFromUi::GridButtonClicked(
+                                id,
+                                GridPosition(Vector2i::new(
+                                    counter as i32 % self.grid_size.x,
+                                    counter as i32 / self.grid_size.x,
+                                )),
+                            ));
+                        }
+                        events.push(event);
+                    }
                 }
             }
             if events.len() > 0 {
