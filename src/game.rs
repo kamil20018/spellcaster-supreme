@@ -12,9 +12,6 @@ pub mod asset_manager;
 mod play_field;
 use play_field::*;
 
-mod spell_creator;
-use spell_creator::*;
-
 mod component;
 use component::*;
 
@@ -48,7 +45,6 @@ impl From<&WorldPosition> for Vector2f {
 pub struct Game<'a> {
     window: FBox<RenderWindow>,
     play_field: PlayField,
-    spell_creator: SpellCreator,
     ui: Ui<'a>,
     ui_mappings: UiMappings,
     ui_state: UiState,
@@ -107,20 +103,13 @@ impl<'a> Game<'a> {
             for _col in 0..11 {
                 let id = UiId::new();
                 spell_component_grid_mappings.insert(id);
-                grid_buttons.push(Box::new(
-                    Button::new_dynamic(id)
-                        .set_bg_color(Color::WHITE),
-                ));
+                grid_buttons.push(Box::new(Button::new_dynamic(id).set_bg_color(Color::WHITE)));
             }
         }
 
         Game {
             window: window,
             play_field: PlayField::new(Vector2u::new(SCREEN_W / 2, SCREEN_H)),
-            spell_creator: SpellCreator::new(
-                Vector2u::new(SCREEN_W / 2, SCREEN_H * 8 / 9),
-                Vector2f::new(SCREEN_W as f32 / 2.0, 0.0),
-            ),
             ui: Ui::new(
                 Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
                 boxed_vec![
@@ -211,7 +200,6 @@ impl<'a> Game<'a> {
         }
         self.ui.update();
         self.play_field.update();
-        self.spell_creator.update();
     }
 
     fn process_ui_event(&mut self, event: &EventFromUi) {
