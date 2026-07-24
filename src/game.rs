@@ -21,7 +21,9 @@ use constant::*;
 mod spawner;
 mod style;
 
-use crate::boxed_vec;
+mod spell_grid;
+
+use crate::{boxed_vec, game::spell_grid::SpellGrid};
 use crate::{
     game::asset_manager::SpellComponentTypes,
     helpers,
@@ -45,6 +47,7 @@ impl From<&WorldPosition> for Vector2f {
 pub struct Game<'a> {
     window: FBox<RenderWindow>,
     play_field: PlayField,
+    spell_grid: SpellGrid<SPELL_GRID_WIDTH, SPELL_GRID_HEIGHT>,
     ui: Ui<'a>,
     ui_mappings: UiMappings,
     ui_state: UiState,
@@ -115,6 +118,7 @@ impl<'a> Game<'a> {
         Game {
             window: window,
             play_field: PlayField::new(Vector2u::new(SCREEN_W / 2, SCREEN_H)),
+            spell_grid: SpellGrid::new(),
             ui: Ui::new(
                 Vector2f::new(SCREEN_W as f32, SCREEN_H as f32),
                 boxed_vec![
@@ -142,7 +146,7 @@ impl<'a> Game<'a> {
                         Vector2f::new(0.5, 8.0 / 9.0),
                         Vector2f::new(0.5, 0.0),
                         UiId::new(),
-                        Vector2i::new(11, 11),
+                        Vector2i::new(SPELL_GRID_WIDTH as i32, SPELL_GRID_HEIGHT as i32),
                         RelativePadding {
                             top: 0.005,
                             botton: 0.005,
@@ -228,9 +232,10 @@ impl<'a> Game<'a> {
                                 self.ui.process_incoming_event(EventToUi::SetTexture(
                                     *button_id,
                                     spell_component.get_texture(),
-                                ))
+                                ));
+
+                                self.spell_grid.set_component(grid_position.0, spell_component);
                             }
-                            eprintln!("grid_position = {:?}", grid_position);
                         }
                         _ => {}
                     }
